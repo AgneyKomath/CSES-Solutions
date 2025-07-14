@@ -1,46 +1,39 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-typedef pair<int,int> pii;
-
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
-    
-    int n,m;
-    cin>>n>>m;
 
-    vector<vector<pii>> adj(n);
-    for(int i=0;i<m;i++){
-        int a,b,d;
-        cin>>a>>b>>d;
-        a--;b--;
-        adj[a].push_back({b,d});
+    int n, m;
+    cin>>n>>m;
+    
+    vector<vector<pair<int, int>>> adj(n);
+    for(int i = 0; i<m; i++){
+        int u, v, w;
+        cin>>u>>v>>w;
+        u--;v--;
+        adj[u].emplace_back(v, w);
     }
 
-    priority_queue<pii,vector<pii>,greater<pii>> pq;
-    vector<int> dist(n,1e18);
-
+    vector<long long> dist(n, 1e18);
+    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
     dist[0] = 0;
-    pq.push({0,0});
+    pq.emplace(0, 0);
+
     while(!pq.empty()){
-        auto [d,u] = pq.top();
+        auto [d, u] = pq.top();
         pq.pop();
         if(dist[u] != d) continue;
-
-        for(auto [v,w]:adj[u]){
-            if(dist[u] + w <dist[v]){
+        for(auto [v, w]:adj[u]){
+            if(dist[u]+w<dist[v]){
                 dist[v] = dist[u] + w;
-                pq.push({dist[v],v});
+                pq.emplace(dist[v], v);
             }
         }
     }
-    for(int i=0;i<n;i++) cout<<dist[i]<<" \n"[i==n-1];
+
+    for(auto i:dist) cout<<i<<' ';
     
     return 0;
 }

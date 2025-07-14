@@ -1,54 +1,45 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-typedef pair<int,int> pii;
-typedef array<int,3> a3;
-
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, m;
     cin>>n>>m;
 
-    vector<vector<pii>> adj(n, vector<pii>(m));
-    
-    while(m--){
-        int a,b,c;
-        cin>>a>>b>>c;
-        a--;b--;
-        adj[a].emplace_back(b,c);
+    vector<vector<pair<int, int>>> adj(n);
+    for(int i = 0; i<m; i++){
+        int u, v, w;
+        cin>>u>>v>>w;
+        u--;v--;
+        adj[u].emplace_back(v, w);
     }
 
-    int src = 0, dest = n-1;
+    vector<array<long long, 2>> dist(n, {1e18, 1e18});
+    priority_queue<array<long long, 3>, vector<array<long long, 3>>, greater<array<long long, 3>>> pq;
 
-    priority_queue<a3,vector<a3>,greater<a3>> pq;
-    vector<int> dist(n,1e18);
+    dist[0] = {0, 0};
+    pq.push({0, 0, 0});
 
-    dist[src] = 0;
-    pq.push({0,src,1});
     while(!pq.empty()){
-        auto [d,u,flag] = pq.top();
+        auto [d, t, u] = pq.top();
         pq.pop();
-        if(dist[u] != d) continue;
+        if(dist[u][t] != d) continue;
 
-        for(auto [v,w]:adj[u]){
-            if(dist[u] + w <dist[v]){
-                dist[v] = dist[u] + w;
-                pq.push({dist[v],v, 1});
-                if(flag){
-                    pq.push({dist[u] + w/2, v});
-                }
+        for(auto [v, w]:adj[u]){
+            if(dist[u][t] + w < dist[v][t]){
+                dist[v][t] = dist[u][t] + w;
+                pq.push({dist[v][t], t, v});
+            }
+            if(t==0 && dist[u][0] + w/2 < dist[v][1]){
+                dist[v][1] = dist[u][0] + w/2;
+                pq.push({dist[v][1], 1, v});
             }
         }
     }
 
+    cout<<dist[n-1][1];
 
     return 0;
 }
-

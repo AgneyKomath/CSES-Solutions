@@ -1,83 +1,97 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-int dr[4]{1,-1,0,0};
-int dc[4]{0,0,1,-1};
+int dir[] = {1, 0, -1, 0, 1};
 
-map<pair<int,int>,char> mp{
-    {{1,0},'D'},
-    {{0,1},'R'},
-    {{-1,0},'U'},
-    {{0,-1},'L'}
-};
-
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, m;
     cin>>n>>m;
-    vector<string> a(n);
-    for(int i=0;i<n;i++) cin>>a[i];
-
-    int x = -1, y =-1;
-
-    queue<array<int,3>> q;
-
-    for(int i =0;i<n;i++){
-        for(int j = 0;j<m;j++){
-            if(a[i][j]=='M'){
-                q.push({i,j,0});
-                a[i][j] = '#';
-            } 
-            if(a[i][j]=='A'){
-                x = i;
-                y = j;
-                a[i][j] = '#';
-            }
-        }
-    }
-   vector<vector<pair<int,int>>> parent(n,vector<pair<int,int>>(m,{-1,-1}));
-
-    q.push({x,y,1});
-    while(!q.empty()){
-        auto [r, c, t] = q.front();
-        q.pop();
-        for(int i=0;i<4;i++){
-            int nr = r + dr[i];
-            int nc = c + dc[i];
-            if(nr<0||nc<0||nr>=n||nc>=m){
-                if(t==1){
-                    cout<<"YES\n";
-                    string path;
-                    while(parent[r][c] != make_pair(-1ll, -1ll)){
-                        auto [pr,pc] = parent[r][c];
-                        path.push_back(mp[{r-pr,c-pc}]);
-                        tie(r,c) = parent[r][c];
-                    }
-                    reverse(path.begin(), path.end());
-                    cout<<path.size()<<'\n';
-                    cout<<path;
-                    return 0;
-                }
-                continue;
-            }
-            if(a[nr][nc]=='#') continue;
-            if(t==1){
-                parent[nr][nc] = {r,c};
-            }
-            a[nr][nc] = '#';
-            q.push({nr,nc,t});
-        }
-    }
-
-    cout<<"NO\n";
     
+    vector<string> a(n);
+    for(auto &i:a) cin>>i;
+
+    vector<vector<int>> dist(n, vector<int>(m, 1e9));
+
+    int ar, ac;
+
+    queue<pair<int, int>> q;
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<m; j++){
+            if(a[i][j]=='M'){
+                q.emplace(i, j);
+                dist[i][j] = 0;
+            }
+            if(a[i][j]=='A'){
+                ar = i;
+                ac = j;
+            }
+        }
+    }
+
+    while(!q.empty()){
+        auto [r, c] = q.front();
+        q.pop();
+        for(int i = 0; i<4; i++){
+            int nr = r + dir[i];
+            int nc = c + dir[i+1];
+            if(nr<0 || nr>=n || nc<0 || nc>=m || a[nr][nc]=='#' || dist[nr][nc]<=1+dist[r][c]) continue;
+            dist[nr][nc] = 1 + dist[r][c];
+            q.emplace(nr, nc);
+        }
+    }
+
+    string path;
+    bool pathfound = false;
+
+    vector<vector<pair<int, int>>> prev(n, vector<pair<int, int>>(m, {-1, -1}));
+    int d = 0;
+    q.emplace(ar, ac);
+    prev[ar][ac] = {ar, ac};
+    while(!q.empty() && !pathfound){
+        d++;
+        int sz = q.size();
+        while(sz--){
+            auto [r, c] = q.front();
+            q.pop();
+
+            if(r==0 || r==n-1 || c==0 || c==m-1){
+                pathfound = true;
+                while(r != ar || c != ac){
+                    auto [pr, pc] = prev[r][c];
+
+                    int dr = r - pr, dc = c - pc;
+                    if(dr==1) path += 'D';
+                    else if(dr==-1) path += 'U';
+                    else if(dc==1) path += 'R';
+                    else if(dc==-1) path += 'L';
+
+                    tie(r, c) = prev[r][c];
+                }
+                break;
+            }
+
+            for(int i = 0; i<4; i++){
+                int nr = r + dir[i];
+                int nc = c + dir[i+1];
+                if(nr<0 || nr>=n || nc<0 || nc>=m || a[nr][nc]=='#' || dist[nr][nc]<=d|| prev[nr][nc].first != -1) continue;
+                prev[nr][nc] = {r, c};
+                q.emplace(nr, nc);
+            }
+        }
+    }
+
+    if(!pathfound){
+        cout<<"NO";
+    }
+    else{
+        cout<<"YES\n";
+        int sz = path.size();
+        cout<<sz<<'\n';
+        for(int i = sz-1; i>=0; i--) cout<<path[i];
+    }
     
     return 0;
 }
