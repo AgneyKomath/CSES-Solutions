@@ -1,17 +1,11 @@
 #include<bits/stdc++.h>
 using namespace std;
- 
-const long long INF = 1e18;
+
 const int mod = 1e9+7;
  
 int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
- 
-    #ifndef ONLINE_JUDGE
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif 
  
     int n, m;
     cin>>n>>m;
@@ -23,7 +17,7 @@ int main(){
         adj[u].emplace_back(v, w);
     }
  
-    vector<long long> dist(n, INF);
+    vector<long long> dist(n, 1e18);
     vector<int> cnt(n, 0);
     vector<int> maxpath(n, 0);
     vector<int> minpath(n, 1e9);

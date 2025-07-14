@@ -1,81 +1,70 @@
 #include <bits/stdc++.h>
-#define int	long long
 using namespace std;
 
-const int dr[] = {1,-1,0,0};
-const int dc[] = {0,0,1,-1};
-
-map<pair<int,int>,char> mp{
-    {{-1,0},'U'},
-    {{1,0},'D'},
-    {{0,-1},'L'},
-    {{0,1},'R'}
+int dir[] = {1, 0, -1, 0, 1};
+map<pair<int, int>, char> mp{
+    {{-1, 0}, 'U'},
+    {{1, 0}, 'D'},
+    {{0, -1}, 'L'},
+    {{0, 1}, 'R'}
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
-    
-    int n,m;
+
+    int n, m;
     cin>>n>>m;
 
-    int Ar,Ac,Br,Bc;
-
     vector<string> a(n);
-    for(int i=0;i<n;i++){
-        cin>>a[i];
-        for(int j=0;j<m;j++){
+    for(auto &i:a) cin>>i;
+
+    queue<pair<int, int>> q;
+    vector<vector<pair<int, int>>> prev(n, vector<pair<int, int>>(m, {-1, -1}));
+
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<m; j++){
             if(a[i][j]=='A'){
-                Ar = i;
-                Ac = j;
-            }
-            if(a[i][j]=='B'){
-                Br = i;
-                Bc = j;
+                q.emplace(i, j);
+                a[i][j] = '#';
             }
         }
-    }
-
-    vector<vector<bool>> visited(n,vector<bool>(m,0));
-    vector<vector<pair<int,int>>> parent(n,vector<pair<int,int>>(m,{-1,-1}));
-    queue<pair<int,int>> q;
-
-    q.push({Ar,Ac});
-    visited[Ar][Ac] = 1;
-
-
-    while(!q.empty()){
-        auto [r,c] = q.front();
-        q.pop();
-        if(r==Br && c==Bc) break;
-        for(int i=0;i<4;i++){
-            int nr = r+dr[i], nc = c+dc[i];
-            if(nr<0||nr>=n||nc<0||nc>=m||a[nr][nc]=='#'||visited[nr][nc]) continue;
-            visited[nr][nc] = 1;
-            parent[nr][nc] = {r,c};
-            q.push({nr,nc});
-        }
-    }
-
-    if(!visited[Br][Bc]){
-        cout<<"NO\n";
-        return 0;
     }
 
     string path;
-    while(!(Br==Ar && Bc==Ac)){
-        auto [r,c] = parent[Br][Bc];
-        path.push_back(mp[{Br-r,Bc-c}]);
-        Br = r;
-        Bc = c;
-    }
-    reverse(path.begin(),path.end());
 
-    cout<<"YES\n"<<path.size()<<'\n'<<path;    
-    
+    while(!q.empty() && path.empty()){
+        auto [r, c] = q.front();
+        q.pop();
+        for(int i = 0; i<4; i++){
+            int nr = r + dir[i], nc = c + dir[i+1];
+            if(nr<0 || nr>=n || nc<0 || nc>=m || a[nr][nc]=='#') continue;
+            prev[nr][nc] = {r, c};
+            if(a[nr][nc]=='B'){
+                int cr = nr, cc = nc;
+                while(prev[cr][cc].first != -1){
+                    auto [pr, pc] = prev[cr][cc];
+                    int dr = cr - pr, dc = cc - pc;
+                    path += mp[{dr, dc}];
+                    cr = pr;
+                    cc = pc;
+                }
+                break;
+            }
+            a[nr][nc] = '#';
+            q.emplace(nr, nc);
+        }
+    }
+
+    if(path.empty()){
+        cout<<"NO";
+    }
+    else{
+        cout<<"YES\n";
+        reverse(path.begin(), path.end());
+        cout<<path.size()<<'\n';
+        cout<<path;
+    }
+
     return 0;
 }
