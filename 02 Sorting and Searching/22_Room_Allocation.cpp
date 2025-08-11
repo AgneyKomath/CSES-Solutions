@@ -1,106 +1,85 @@
 #include <bits/stdc++.h>
-#define int	long long
 using namespace std;
 
-int32_t main(){
+// Set Approach
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n;cin>>n;
-    vector<tuple<int,int,int>> a(n);
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin>>x>>y;
-        a[i] = {x,y,i};
+    int n;
+    cin>>n;
+    
+    vector<array<int, 3>> a(n);
+    for(int i = 0; i<n; i++){
+        int s, e;
+        cin>>s>>e;
+        a[i] = {s, e, i};
     }
 
-    sort(a.begin(),a.end());
+    sort(a.begin(), a.end());
 
-    set<pair<int,int>> st;
+    int roomCount = 0;
+    set<pair<int, int>> st;
+
     vector<int> res(n);
-
-    int roomNo = 0;
-    for(auto &[s,e,ind]:a){
-        if(st.empty() || (*st.begin()).first>=s){
-            roomNo++;
-            st.insert({e,roomNo});
-            res[ind] = roomNo;
+    for(auto [s, e, i]:a){
+        if(st.empty() || st.begin()->first>=s){
+            roomCount++;
+            st.emplace(e, roomCount);
+            res[i] = roomCount;
         }
         else{
-            auto tp = *st.begin();
+            auto roomNo = st.begin()->second;
             st.erase(st.begin());
-            tp.first = e;
-            res[ind] = tp.second;
-            st.insert(tp);
+            st.emplace(e, roomNo);
+            res[i] = roomNo;
         }
     }
 
-    cout<<roomNo<<'\n';
+    cout<<roomCount<<'\n';
     for(int i:res) cout<<i<<' ';
-    cout<<'\n';
-    
+
     return 0;
 }
 
-
-// // Ordered Set
-// #include <bits/stdc++.h>
-// using namespace std;
-
-// #include <ext/pb_ds/assoc_container.hpp>
-// #include <ext/pb_ds/tree_policy.hpp>
-// using namespace __gnu_pbds;
-
-// typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag,
-//              tree_order_statistics_node_update>
-//     ordered_set;
-
-// int32_t main(){
+// // Vector Approach, Better Runtime
+// int main(){
 //     ios::sync_with_stdio(false);
 //     cin.tie(NULL);
-//     #ifdef Fusion15
-//     freopen("input.txt", "r", stdin);
-//     freopen("output.txt", "w", stdout);
-//     #endif
 
 //     int n;
 //     cin>>n;
-
-//     vector<array<int,3>> a(n);
-//     int ind = 0;
-//     for(auto &[s,e,i]:a) {
+    
+//     vector<array<int, 3>> a(2*n);
+//     for(int i = 0; i<n; i++){
+//         int s, e;
 //         cin>>s>>e;
-//         i = ind++;
+//         a[2*i] = {s, 0, i};
+//         a[2*i+1] = {e, 1, i};
 //     }
+
 //     sort(a.begin(), a.end());
 
-//     ordered_set st;
-    
-//     vector<int> res(n,0);
-//     int id = 0;
-    
-//     for(auto &[s,e,ind]:a){
-//         auto it = st.lower_bound({s, -1});
-//         if(it == st.begin()){
-//             ++id;
-//             st.insert({e,id});
-//             res[ind] = id;
-//         } 
+//     int roomCount = 0;
+//     vector<int> rooms, res(n);
+//     for(auto [time, type, id]:a){
+//         if(type==0){
+//             if(rooms.empty()){
+//                 roomCount++;
+//                 res[id] = roomCount;
+//             }
+//             else{
+//                 res[id] = rooms.back();
+//                 rooms.pop_back();
+//             }
+//         }
 //         else{
-//             it--;
-//             int room = it->second;
-//             st.erase(it);
-//             st.insert({e,room});
-//             res[ind] = room;
+//             rooms.push_back(res[id]);
 //         }
 //     }
 
-//     cout<<id<<'\n';
-//     for(auto i:res) cout<<i<<' ';
-    
+//     cout<<roomCount<<'\n';
+//     for(int i:res) cout<<i<<' ';
+
 //     return 0;
 // }

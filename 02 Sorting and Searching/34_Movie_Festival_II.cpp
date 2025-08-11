@@ -1,27 +1,24 @@
 #include <bits/stdc++.h>
-#define int	long long
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n,k;
+    int n, k;
     cin>>n>>k;
 
-    vector<pair<int,int>> a(n);
-    for(auto &[e,s]:a) cin>>s>>e;
+    vector<pair<int, int>> a(n);
+    for(auto &[e, s]:a){
+        cin>>s>>e;
+    }
 
-    sort(a.begin(),a.end());
+    sort(a.begin(), a.end());
+
+    int res = 0;
 
     multiset<int> st;
-
-    int res=0;
-    for(auto &[e,s]:a){
+    for(auto [e, s]:a){
         if(st.empty()){
             st.insert(e);
             res++;
@@ -29,7 +26,7 @@ int32_t main(){
         }
         auto it = st.upper_bound(s);
         if(it!=st.begin()){
-            it = prev(it);
+            it--;
             st.erase(it);
             st.insert(e);
             res++;
@@ -42,7 +39,7 @@ int32_t main(){
         }
     }
 
-    cout<<res<<'\n';
+    cout<<res;
     
     return 0;
 }

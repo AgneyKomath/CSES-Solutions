@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int main(void){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
@@ -12,7 +12,7 @@ int main(void){
     for(int &i:a) cin>>i;
     
     int res = 0;
-    map<int,int> mp;
+    map<int, int> mp;
 
     for(int i = 0, j = 0; j<n; j++){
         mp[a[j]]++;

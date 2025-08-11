@@ -1,48 +1,37 @@
 #include <bits/stdc++.h>
-#define int	long long
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n,k;
+    int n, k;
     cin>>n>>k;
 
     vector<int> a(n);
-    int sm=0,mx=0;
-    for(int &i:a){
-        cin>>i;
-        sm +=i;
-        mx = max(mx,i);
-    }
+    for(int &i:a) cin>>i;
 
-    int res=sm;
-
-    int lo = mx,hi = sm;
-    while(lo<=hi){
-        int mid = lo + (hi-lo)/2;
-
-        int tot=1,curr=0;
-        for(int &i:a){
-            if(curr+i>mid){
-                tot++;
-                curr=i;
+    auto check = [&](long long val)->bool{
+        int cnt = 1;
+        long long curr = 0;
+        for(int i:a){
+            if(curr + i > val){
+                curr = i;
+                cnt++;
             }
             else curr += i;
         }
-        if(tot<=k){
-            res = min(res,mid);
-            hi = mid-1;
-        }
+        return cnt<=k;
+    };
+
+    long long lo = *max_element(a.begin(), a.end()), hi = 2e14;
+    while(lo<hi){
+        long long mid = (lo + hi) / 2;
+        if(check(mid)) hi = mid;
         else lo = mid+1;
     }
 
-    cout<<res<<'\n';
+    cout<<hi;
     
     return 0;
 }
