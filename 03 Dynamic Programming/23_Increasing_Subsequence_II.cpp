@@ -1,16 +1,11 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
 const int mod = 1e9+7;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n;
     cin>>n;
@@ -21,9 +16,11 @@ int32_t main(){
     vector<int> b(a);
     sort(b.begin(), b.end());
     b.erase(unique(b.begin(), b.end()), b.end());
-    for(int &i:a) i = lower_bound(b.begin(), b.end(), i) - b.begin()+1;
+    for(int &i:a){ 
+        i = lower_bound(b.begin(), b.end(), i) - b.begin();
+    }
 
-    int sz = b.size() + 1;
+    int sz = b.size();
     
     // Fenwick Tree
     vector<int> tree(sz+1, 0);
@@ -44,6 +41,7 @@ int32_t main(){
         int v = sum(i-1);
         add(i, v+1);
     }
+    
     cout<<sum(sz-1);
     
     return 0;
