@@ -1,82 +1,41 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-class BIT{
-    //Fenwick Tree by Fusion15
-    vector<vector<bool>> arr;
-    vector<vector<int>> tree;
+struct BIT{
     int n;
+    vector<vector<int>> tree;
 
-    void build(){
-        for(int i=0;i<n;i++){
-            for(int j = 0;j<n;j++){
-                add(i, j, arr[i][j]);
+    BIT(int _n){
+        n = _n;
+        tree.assign(n+1, vector<int>(n+1, 0));
+    }
+
+    void add(int r, int c, int v){
+        for(int i = r+1; i<=n; i+=i&-i){
+            for(int j = c+1; j<=n; j+=j&-j){
+                tree[i][j] += v;
             }
         }
     }
 
-    int query(int y, int x){
-        int s = 0;
-        for(int i = y+1;i>0;i -= i&-i){
-            for(int j = x+1; j>0; j -= j&-j){
-                s += tree[i][j];
+    int query(int r, int c){
+        int sum = 0;
+        for(int i = r+1; i; i-=i&-i){
+            for(int j = c+1; j; j-=j&-j){
+                sum += tree[i][j];
             }
         }
-        return s;
+        return sum;
     }
 
-public:
-    
-    BIT(vector<string> &a){
-        n = a.size();
-        arr.resize(n,vector<bool>(n, 0));
-        for(int i = 0;i<n;i++){
-            for(int j = 0;j<n;j++){
-                if(a[i][j]=='*') arr[i][j] = 1;
-            }
-        }
-
-        tree.resize(n+1,vector<int>(n+1, 0));
-
-        build();
-    }
-
-    void add(int y, int x,  int val){
-        
-
-        for(int i=y+1;i<=n; i += i&-i){
-            for(int j = x+1; j<=n; j += j&-j){
-                tree[i][j] += val;
-            }
-        }
-    }
-
-    void update(int y, int x){
-        int val;
-        if(arr[y][x]){
-            arr[y][x] = 0;
-            val = -1;
-        }
-        else{
-            arr[y][x] = 1;
-            val = 1;
-        }
-        add(y, x, val);
-    }
-
-    int query(int y1, int x1, int y2, int x2){
-        return query(y2, x2) - query(y1-1, x2) - query(y2, x1-1) + query(y1-1, x1-1); 
+    int query(int r1, int c1, int r2, int c2){
+        return query(r2, c2) - query(r1-1, c2) - query(r2, c1-1) + query(r1-1, c1-1);
     }
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, q;
     cin>>n>>q;
@@ -84,23 +43,36 @@ int32_t main(){
     vector<string> a(n);
     for(auto &i:a) cin>>i;
 
-    BIT bit(a);
+    BIT bit(n);
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<n; j++){
+            if(a[i][j]=='*'){
+                bit.add(i, j, 1);
+            }
+        }
+    }
 
     while(q--){
         int t;
         cin>>t;
         if(t==1){
-            int y, x;
-            cin>>y>>x;
-            y--;
-            x--;
-            bit.update(y, x);
+            int r, c;
+            cin>>r>>c;
+            r--;c--;
+            if(a[r][c]=='*'){
+                a[r][c] = '.';
+                bit.add(r, c, -1);
+            }
+            else{
+                a[r][c] = '*';
+                bit.add(r, c, 1);
+            }
         }
-        else{
-            int y1, x1, y2, x2;
-            cin>>y1>>x1>>y2>>x2;
-            y1--;x1--;y2--;x2--;
-            cout<<bit.query(y1, x1, y2, x2)<<'\n';
+        else if(t==2){
+            int r1, c1, r2, c2;
+            cin>>r1>>c1>>r2>>c2;
+            r1--;c1--;r2--;c2--;
+            cout<<bit.query(r1, c1, r2, c2)<<'\n';
         }
     }
     

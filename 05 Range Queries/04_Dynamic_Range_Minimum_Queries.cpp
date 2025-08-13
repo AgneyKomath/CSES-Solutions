@@ -1,58 +1,61 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-class SegTree {
-    //Fusion15
+struct SegTree {
+    //Segment Tree by Fusion15
     vector<int> tree;
-    vector<int> arr;
     int n;
 
-    int neutralValue = INT_MAX;
+    //Change
+    int neutral = 1e9;
     int merge(int a, int b) {
-        return min(a,b);
+        return min(a, b);
     }
 
-    void build(int node, int start, int end) {
-        if (start == end) tree[node] = arr[start];
-        else {
+    void build(int node, int start, int end, vector<int> &arr) {
+        if(start == end) tree[node] = arr[start];
+        else{
             int mid = (start + end) / 2;
-            build(2 * node, start, mid);
-            build(2 * node + 1, mid + 1, end);
-            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
+            build(2*node, start, mid, arr);
+            build(2*node+1, mid + 1, end, arr);
+            tree[node] = merge(tree[2*node], tree[2*node+1]);
         }
     }
 
     void update(int node, int start, int end, int idx, int value) {
-        if (start == end) {
-            arr[idx] = value;
+        if(start == end) {
             tree[node] = value;
-        } else {
+        }
+        else{
             int mid = (start + end) / 2;
-            if (start <= idx && idx <= mid) {
-                update(2 * node, start, mid, idx, value);
-            } else {
-                update(2 * node + 1, mid + 1, end, idx, value);
+            if(idx <= mid) {
+                update(2*node, start, mid, idx, value);
             }
-            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
+            else{
+                update(2*node+1, mid + 1, end, idx, value);
+            }
+            tree[node] = merge(tree[2*node], tree[2*node+1]);
         }
     }
 
     int query(int node, int start, int end, int L, int R) {
-        if (R < start || L > end) return neutralValue;
+        if (R < start || L > end) return neutral;
         if (L <= start && end <= R) return tree[node];
         int mid = (start + end) / 2;
-        int l = query(2 * node, start, mid, L, R);
-        int r = query(2 * node + 1, mid + 1, end, L, R);
+        int l = query(2*node, start, mid, L, R);
+        int r = query(2*node+1, mid + 1, end, L, R);
         return merge(l, r);
     }
 
-public:
-    SegTree(const vector<int> &a) {
+    SegTree(int _n){
+        n = _n;
+        tree.resize(4*n, neutral);
+    }
+
+    SegTree(vector<int> &a) {
         n = a.size();
         tree.resize(4 * n);
-        arr = a;
-        build(1, 0, n - 1);
+        build(1, 0, n - 1, a);
     }
 
     int query(int l, int r) {
@@ -64,15 +67,11 @@ public:
     }
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n,q;
+    int n, q;
     cin>>n>>q;
 
     vector<int> a(n);
@@ -81,21 +80,22 @@ int32_t main(){
     SegTree st(a);
 
     while(q--){
-        int t,k,u,l,r;
-        cin>>t;
-        if(t==2){
+        int type;
+        cin>>type;
+        if(type==1){
+            int id, val;
+            cin>>id>>val;
+            id--;
+            st.update(id, val);
+        }
+        else if(type==2){
+            int l, r;
             cin>>l>>r;
             l--;
             r--;
-            cout<<st.query(l,r)<<'\n';
-        }
-        else{
-            cin>>k>>u;
-            k--;
-            st.update(k,u);
+            cout<<st.query(l, r)<<'\n';
         }
     }
-    
     
     return 0;
 }

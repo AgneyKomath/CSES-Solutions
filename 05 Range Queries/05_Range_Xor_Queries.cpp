@@ -1,29 +1,28 @@
 #include <bits/stdc++.h>
-#define int	long long
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n,q;
+    int n, q;
     cin>>n>>q;
-    vector<int> pref(n+1,0);
-    for(int i =1;i<=n;i++){
-        cin>>pref[i];
-        pref[i] ^= pref[i-1];
+
+    vector<int> a(n);
+    for(int &i:a) cin>>i;
+
+    vector<int> pref(n+1);
+    pref[0] = 0;
+    for(int i = 0; i<n; i++){
+        pref[i+1] = pref[i] ^ a[i];
     }
 
     while(q--){
-        int a,b;
-        cin>>a>>b;
-        cout<<(pref[b]^pref[a-1])<<'\n';
+        int l, r;
+        cin>>l>>r;
+        int res = pref[r] ^ pref[l-1];
+        cout<<res<<'\n';
     }
-    
     
     return 0;
 }

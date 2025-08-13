@@ -1,103 +1,85 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-class SegTree {
-    //Fusion15
-    vector<int> tree;
+struct BIT{
+    //Fenwick Tree by Fusion15
     vector<int> arr;
+    vector<long long> tree;
     int n;
-
-    int neutralValue = 0;
-    int merge(int a, int b) {
-        return a + b;
-    }
-
-    void build(int node, int start, int end) {
-        if (start == end) tree[node] = arr[start];
-        else {
-            int mid = (start + end) / 2;
-            build(2 * node, start, mid);
-            build(2 * node + 1, mid + 1, end);
-            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
+    
+    void build(vector<int> &a){
+        for(int i = 0; i<n; i++){
+            add(i, a[i]);
         }
     }
-
-    void update(int node, int start, int end, int idx, int value) {
-        if (start == end) {
-            arr[idx] = value;
-            tree[node] = value;
-        } else {
-            int mid = (start + end) / 2;
-            if (start <= idx && idx <= mid) {
-                update(2 * node, start, mid, idx, value);
-            } else {
-                update(2 * node + 1, mid + 1, end, idx, value);
-            }
-            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
-        }
+    
+    BIT(int _n){
+        n = _n;
+        tree.resize(n+1, 0);
+        arr.resize(n, 0);
     }
-
-    int query(int node, int start, int end, int L, int R) {
-        if (R < start || L > end) return neutralValue;
-        if (L <= start && end <= R) return tree[node];
-        int mid = (start + end) / 2;
-        int l = query(2 * node, start, mid, L, R);
-        int r = query(2 * node + 1, mid + 1, end, L, R);
-        return merge(l, r);
-    }
-
-public:
-    SegTree(const vector<int> &a) {
+    
+    BIT(vector<int> &a){
         n = a.size();
-        tree.resize(4 * n);
-        arr = a;
-        build(1, 0, n - 1);
+        arr.resize(n, 0);
+        tree.resize(n+1, 0);
+        build(a);
+    }
+    
+    void add(int ind, int val){
+        arr[ind] += val;
+        for(int i=ind+1; i<=n; i += i&-i){
+            tree[i] += val;
+        }
+    }
+    
+    void update(int ind, int val){
+        int diff = val - arr[ind];
+        add(ind, diff);
+    }
+    
+    long long query(int ind){
+        long long sum = 0;
+        for(int i = ind+1; i>0; i -= i&-i){
+            sum += tree[i];
+        }
+        return sum;
     }
 
-    int query(int l, int r) {
-        return query(1, 0, n - 1, l, r);
-    }
-
-    void update(int idx, int value) {
-        update(1, 0, n - 1, idx, value);
+    long long query(int l, int r){
+        return query(r) - query(l-1);
     }
 };
 
-
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n,q;
+    int n, q;
     cin>>n>>q;
 
     vector<int> a(n);
     for(int &i:a) cin>>i;
 
-    SegTree st(a);
+    BIT bit(a);
 
     while(q--){
-        int type,k,u,l,r;
+        int type;
         cin>>type;
         if(type==1){
-            cin>>k>>u;
-            k--;
-            st.update(k,u);
-        } 
-        else{
+            int id, val;
+            cin>>id>>val;
+            id--;
+            bit.update(id, val);
+        }
+        else if(type==2){
+            int l, r;
             cin>>l>>r;
-            l--;r--;
-            cout<<st.query(l,r)<<'\n';
+            l--;
+            r--;
+            cout<<bit.query(l, r)<<'\n';
         }
     }
-
-
-    
     
     return 0;
 }

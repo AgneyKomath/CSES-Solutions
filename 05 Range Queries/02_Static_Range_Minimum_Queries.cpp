@@ -1,34 +1,59 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int MIN[200001][18];
+struct SparseTable {
+    vector<vector<int>> table;
 
-int32_t main(){
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
+    // Change
+    int merge(int a, int b){
+        return min(a, b);
+    }
 
-    int n,q;
-    cin>>n>>q;
+    void build(const vector<int> &arr) {
+        int n = arr.size();
+        int maxLog = __lg(n) + 1;
 
-    for(int i=0;i<n;i++) cin>>MIN[i][0];
-    int mxLog = log2(n) + 1;
-    for (int j = 1; j < mxLog; j++) {
-        for (int i = 0; i + (1 << j) <= n; i++) {
-            MIN[i][j] = min(MIN[i][j - 1], MIN[i + (1 << (j - 1))][j - 1]);
+        table.assign(n, vector<int>(maxLog));
+
+        for (int i = 0; i<n; i++) {
+            table[i][0] = arr[i];
+        }
+
+        for (int j = 1; j<maxLog; j++) {
+            for (int i = 0; i + (1<<j) <= n; i++) {
+                table[i][j] = merge(table[i][j - 1], table[i + (1 << (j - 1))][j - 1]);
+            }
         }
     }
-    
+
+    SparseTable(const vector<int>& arr) {
+        build(arr);
+    }
+
+    int query(int l, int r) {
+        int j = __lg(r - l + 1);
+        return merge(table[l][j], table[r - (1<<j) + 1][j]);
+    }
+};
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n, q;
+    cin>>n>>q;
+
+    vector<int> a(n);
+    for(int &i:a) cin>>i;
+
+    SparseTable st(a);
 
     while(q--){
-        int l,r;
+        int l, r;
         cin>>l>>r;
-        l--;r--;
-        int j = log2(r-l+1);
-        cout<<min(MIN[l][j],MIN[r-(1<<j)+1][j])<<'\n';
+        l--;
+        r--;
+        cout<<st.query(l, r)<<'\n';
     }
     
     return 0;

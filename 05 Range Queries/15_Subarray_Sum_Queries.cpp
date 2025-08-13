@@ -1,31 +1,23 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
 struct Node{
-    int pref;
-    int suff;
-    int sub;
-    int full;
-
-    Node(){
-        pref = 0;
-        suff=0;
-        sub=0;
-        full=0;
+    long long pref = 0;
+    long long suff = 0;
+    long long mxSub = 0;
+    long long fullSub = 0;
+    Node(){}
+    Node(int val){
+        pref = max(0, val);
+        suff = max(0, val);
+        mxSub = max(0, val);
+        fullSub = val;
     }
-    Node(int _pref, int _suff, int _sub, int _full){
-        pref = max(0ll, _pref);
-        suff = max(0ll, _suff);
-        sub = max(0ll, _sub);
-        full = _full;
-    }
-    Node(int v){
-        int temp = max(0ll,v);
-        pref = temp;
-        suff = temp;
-        sub = temp;
-        full = v;
+    Node(long long pf, long long sf, long long mxsb, long long flsb){
+        pref = max(0ll, pf);
+        suff = max(0ll, sf);
+        mxSub = max(0ll, mxsb);
+        fullSub = flsb;
     }
 };
 
@@ -39,11 +31,11 @@ class SegTree {
     //Change
     T neutral = Node();
     T merge(T a, T b) {
-        int pref = max(a.pref, a.full + b.pref);
-        int suff = max(b.suff, b.full + a.suff);
-        int sub = max({a.sub, b.sub, a.suff + b.pref});
-        int full = a.full + b.full;
-        return Node(pref, suff, sub, full); 
+        long long pref = max(a.pref, a.fullSub + b.pref);
+        long long suff = max(b.suff, b.fullSub + a.suff);
+        long long mxSub = max({a.mxSub, b.mxSub, a.suff + b.pref});
+        long long fullSub = a.fullSub + b.fullSub;
+        return Node(pref, suff, mxSub, fullSub); 
     }
 
     void build(int node, int start, int end) {
@@ -87,7 +79,6 @@ class SegTree {
     }
 
 public:
-    SegTree(){}
     SegTree(int _n){
         n = _n;
         tree.resize(4*n, neutral);
@@ -109,30 +100,25 @@ public:
     }
 };
 
-
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n,q;
+    int n, q;
     cin>>n>>q;
-
+    
     vector<int> a(n);
     for(int &i:a) cin>>i;
 
     SegTree<Node> st(a);
 
     while(q--){
-        int k,x;
+        int k, x;
         cin>>k>>x;
-        st.update(k-1,x);
-        cout<<(st.query(0,n-1)).sub<<'\n';
+        k--;
+        st.update(k, x);
+        cout<<st.query(0, n-1).mxSub<<'\n';
     }
-    
     
     return 0;
 }

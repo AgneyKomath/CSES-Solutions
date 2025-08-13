@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
 struct SegTree {
@@ -59,7 +58,7 @@ struct SegTree {
 
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     #ifdef Fusion15
@@ -74,7 +73,7 @@ int32_t main(){
 
     SegTree st(a);
 
-    vector<int> dp(n+1, 1);
+    vector<int> dp(n+1);
     dp[n] = 0;
     for(int i = n-1; i>=0; i--){
         int id = st.nextGreat(i, a[i]);

@@ -1,116 +1,126 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-class SegTree {
-    //Template by Fusion15
-    vector<int> tree;
-    vector<int> arr;
-    int n;
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
 
-    //Change
-    int neutralValue = 0;
-    int merge(int a, int b) {
-        return a + b;
-    }
+#define ordered_set tree<pair<int, int>, null_type,less<pair<int, int>>, rb_tree_tag,tree_order_statistics_node_update>
 
-    void build(int node, int start, int end) {
-        if(start == end) tree[node] = arr[start];
-        else{
-            int mid = (start + end) / 2;
-            build(2*node, start, mid);
-            build(2*node+1, mid + 1, end);
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
-        }
-    }
-
-    void update(int node, int start, int end, int idx, int value) {
-        if(start == end) {
-            arr[idx] = value;
-            tree[node] = value;
-        }
-        else{
-            int mid = (start + end) / 2;
-            if(start <= idx && idx <= mid) {
-                update(2*node, start, mid, idx, value);
-            }
-            else{
-                update(2*node+1, mid + 1, end, idx, value);
-            }
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
-        }
-    }
-
-    int query(int node, int start, int end, int L, int R) {
-        if (R < start || L > end) return neutralValue;
-        if (L <= start && end <= R) return tree[node];
-        int mid = (start + end) / 2;
-        int l = query(2*node, start, mid, L, R);
-        int r = query(2*node+1, mid + 1, end, L, R);
-        return merge(l, r);
-    }
-
-    int walk(int node, int start, int end, int pos){
-        if(start==end){
-            return start;
-        }
-        int mid = (start + end)/2;
-        if(tree[2*node]>=pos){
-            return walk(2*node,start,mid,pos);
-        }
-        else{
-            pos -= tree[2*node];
-            return walk(2*node+1,mid+1,end,pos);
-        }
-    }
-
-public:
-    SegTree(const vector<int> &a) {
-        n = a.size();
-        tree.resize(4 * n);
-        arr = a;
-        build(1, 0, n - 1);
-    }
-
-    int query(int l, int r) {
-        return query(1, 0, n - 1, l, r);
-    }
-
-    void update(int idx, int value) {
-        update(1, 0, n - 1, idx, value);
-    }
-
-    int walk(int pos){
-        if(tree[1]<pos) return -1;
-        return walk(1, 0, n-1, pos);
-    }
-};
-
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n;
     cin>>n;
-    vector<int> a(n);
-    for(int &i:a) cin>>i;
 
-    vector<int> temp(n,1);
-    SegTree st(temp);
-
-    for(int i=0;i<n;i++){
-        int pos;
-        cin>>pos;
-        int ind = st.walk(pos);
-        // cout<<ind<<'\n';
-        cout<<a[ind]<<' ';
-        st.update(ind,0);
+    ordered_set st;
+    for(int i = 0; i<n; i++){
+        int v;
+        cin>>v;
+        st.insert({i, v});
     }
-    
-    
+
+    for(int i = 0; i<n; i++){
+        int id;
+        cin>>id;
+        id--;
+        auto it = st.find_by_order(id);
+        cout<<it->second<<' ';
+        st.erase(it);
+    }
+
     return 0;
 }
+
+// // Segment Tree Approach
+// struct SegTree {
+//     //Segment Tree by Fusion15
+//     vector<int> tree;
+//     int n;
+
+//     //Change
+//     int neutral = 0;
+//     int merge(int a, int b) {
+//         return a + b;
+//     }
+
+//     void build(int node, int start, int end, vector<int> &arr) {
+//         if(start == end) tree[node] = arr[start];
+//         else{
+//             int mid = (start + end) / 2;
+//             build(2*node, start, mid, arr);
+//             build(2*node+1, mid + 1, end, arr);
+//             tree[node] = merge(tree[2*node], tree[2*node+1]);
+//         }
+//     }
+
+//     void update(int node, int start, int end, int idx, int val) {
+//         if(start == end) {
+//             tree[node] = val;
+//         }
+//         else{
+//             int mid = (start + end) / 2;
+//             if(idx <= mid) {
+//                 update(2*node, start, mid, idx, val);
+//             }
+//             else{
+//                 update(2*node+1, mid + 1, end, idx, val);
+//             }
+//             tree[node] = merge(tree[2*node], tree[2*node+1]);
+//         }
+//     }
+
+//     int walk(int node, int start, int end, int val){
+//         if(start==end) return start;
+//         int mid = (start + end) / 2;
+//         if(tree[2*node]>=val){
+//             return walk(2*node, start, mid, val);
+//         }
+//         else{
+//             return walk(2*node+1, mid+1, end, val - tree[2*node]);
+//         }
+//     }
+
+//     SegTree(vector<int> &a) {
+//         n = a.size();
+//         tree.resize(4 * n);
+//         build(1, 0, n - 1, a);
+//     }
+
+//     void update(int idx, int val) {
+//         update(1, 0, n - 1, idx, val);
+//     }
+    
+//     int walk(int val){
+//         return walk(1, 0, n-1, val);
+//     }
+// };
+
+// int main(){
+//     ios::sync_with_stdio(false);
+//     cin.tie(NULL);
+//     #ifdef Fusion15
+//     freopen("input.txt", "r", stdin);
+//     freopen("output.txt", "w", stdout);
+//     #endif
+
+//     int n;
+//     cin>>n;
+
+//     vector<int> a(n);
+//     for(int &i:a) cin>>i;
+
+//     vector<int> ids(n, 1);
+//     SegTree st(ids);
+
+//     for(int i = 0; i<n; i++){
+//         int p;
+//         cin>>p;
+//         int id = st.walk(p);
+//         cout<<a[id]<<' ';
+//         st.update(id, 0);
+//     }
+    
+//     return 0;
+// }
