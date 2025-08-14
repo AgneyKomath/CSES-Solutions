@@ -1,14 +1,9 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n;
     cin>>n;
@@ -21,27 +16,32 @@ int32_t main(){
         adj[v].push_back(u);
     }
 
-    vector<int> subtree(n), distances(n);
-    auto dfs1 = [&](int node, int par, auto &&dfs1)->void{
-        subtree[node] = 1;
-        distances[node] = 0;
-        for(int i:adj[node]) if(i != par){
-            dfs1(i, node, dfs1);
-            subtree[node] += subtree[i];
-            distances[node] += distances[i] + subtree[i];
+    vector<int> subtree(n, 1);
+    vector<long long> distances(n, 0);
+
+    auto dfs1 = [&](int u, int p, auto &&dfs1)->void{
+        for(int v:adj[u]){
+            if(v==p) continue;
+            dfs1(v, u, dfs1);
+            subtree[u] += subtree[v];
+            distances[u] += distances[v] + subtree[v];
         }
     };
-    auto dfs2 = [&](int node, int par, auto &&dfs2)->void{
-        if(par != -1){
-            distances[node] = distances[par] + n - 2*subtree[node];
-        }
-        for(int i:adj[node]) if(i != par){
-            dfs2(i, node, dfs2);
+
+    auto dfs2 = [&](int u, int p, auto &&dfs2)->void{
+        for(int v:adj[u]){
+            if(v==p) continue;
+            distances[v] = distances[u] + n - 2 * subtree[v]; 
+            dfs2(v, u, dfs2);
         } 
     };
+
     dfs1(0, -1, dfs1);
     dfs2(0, -1, dfs2);
-    for(auto i:distances) cout<<i<<' ';
+
+    for(auto i:distances){
+        cout<<i<<' ';
+    }
     
     return 0;
 }

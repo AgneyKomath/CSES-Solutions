@@ -1,42 +1,32 @@
 #include <bits/stdc++.h>
-#define int	long long
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n;
     cin>>n;
-    vector<vector<int>> adj(n+1);
 
-    for(int i=2;i<=n;i++){
-        int boss;
-        cin>>boss;
-        adj[boss].push_back(i);
+    vector<vector<int>> adj(n);
+    for(int i = 1; i<n; i++){
+        int p;
+        cin>>p;
+        p--;
+        adj[p].push_back(i);
     }
 
-    vector<int> subordinates(n+1,-1);
-    auto dfs{[&](int node, auto &self)->int{
-        {}
-        int res=0;
-        for(auto child:adj[node]){
-            res += 1+self(child,self);
+    vector<int> res(n, 0);
+    auto dfs = [&](int u, auto &&dfs)->void{
+        for(int v:adj[u]){
+            dfs(v, dfs);
+            res[u] += 1 + res[v]; 
         }
-        subordinates[node] = res;
-        return subordinates[node];
-    }};
+    };
 
-    dfs(1,dfs);
-    for(int i=1;i<=n;i++){
-        cout<<subordinates[i]<<' ';
-    }
+    dfs(0, dfs);
 
-    
+    for(int i:res) cout<<i<<' ';
     
     return 0;
 }

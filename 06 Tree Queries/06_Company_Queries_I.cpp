@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
 struct Tree{
@@ -80,26 +79,22 @@ struct Tree{
 
         return pow2ends[node1][0];
     }
-
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, q;
     cin>>n>>q;
 
     vector<vector<int>> adj(n);
     for(int i = 1;i<n;i++){
-        int boss;
-        cin>>boss;
-        adj[i].push_back(boss-1);
-        adj[boss-1].push_back(i);
+        int p;
+        cin>>p;
+        p--;
+        adj[i].push_back(p);
+        adj[p].push_back(i);
     }
 
     Tree tr(adj, 0);

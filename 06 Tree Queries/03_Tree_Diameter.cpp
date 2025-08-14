@@ -1,44 +1,35 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n;
     cin>>n;
+
     vector<vector<int>> adj(n);
-    for(int i = 0;i<n-1;i++){
-        int u,v;
+    for(int i = 0; i<n-1; i++){
+        int u, v;
         cin>>u>>v;
-        adj[u-1].push_back(v-1);
-        adj[v-1].push_back(u-1);
+        u--;v--;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
     }
 
-    vector<int> dist(n,-1);
-    auto dfs=[&](int node, int d, auto &&self){
-        if(dist[node]!=-1) return;
-        dist[node] = d;
-        for(int i:adj[node]) self(i, d+1, self);
+    auto dfs = [&](int u, int p, int d, auto &&dfs)->pair<int, int>{
+        pair<int, int> res = {d, u};
+        for(int v:adj[u]){
+            if(v==p) continue;
+            res = max(res, dfs(v, u, d+1, dfs));
+        }
+        return res;
     };
-    
-    dfs(0, 0, dfs);
 
-    int u = 0;
-    for(int i = 1;i<n;i++){
-        if(dist[i]>dist[u]) u = i;
-    }
+    int farthestNode = dfs(0, -1, 0, dfs).second;
+    int diameter = dfs(farthestNode, -1, 0, dfs).first;
 
-    fill(dist.begin(), dist.end(), -1);
-
-    dfs(u, 0, dfs);
-
-    cout<<*max_element(dist.begin(), dist.end());
+    cout<<diameter;
     
     return 0;
 }

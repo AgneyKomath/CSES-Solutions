@@ -1,14 +1,9 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, q;
     cin>>n>>q;
@@ -28,24 +23,25 @@ int32_t main(){
     // Euler Tour
     vector<int> tin(n), tout(n);
     int timer = 0;
-    auto dfs = [&](int node, int par, auto &&dfs)->void{
-        tin[node] = timer++;
-        for(int i:adj[node]) if(i != par){
-            dfs(i, node, dfs);
+    auto dfs = [&](int u, int p, auto &&dfs)->void{
+        tin[u] = timer++;
+        for(int v:adj[u]){
+            if(v==p) continue;
+            dfs(v, u, dfs);
         }
-        tout[node] = timer;
+        tout[u] = timer;
     };
     dfs(0, -1, dfs);
 
     //Fenwick Tree
-    vector<int> tree(n+2, 0);
-    auto add = [&](int ind, int val){
+    vector<long long> tree(n+2, 0);
+    auto add = [&](int ind, long long val){
         for(int i = ind+1; i<=n+1; i += i&-i){
             tree[i] += val;
         }
     };
-    auto sum = [&](int ind){
-        int res = 0;
+    auto query = [&](int ind){
+        long long res = 0;
         for(int i = ind+1; i; i -= i&-i){
             res += tree[i];
         }
@@ -62,20 +58,20 @@ int32_t main(){
         int t;
         cin>>t;
         if(t==1){
-            int s, x;
-            cin>>s>>x;
-            s--;
-            int prev = a[s];
-            add(tin[s], x - prev);
-            add(tout[s], prev - x);
-            a[s] = x;
+            int u, val;
+            cin>>u>>val;
+            u--;
+            int prev = a[u];
+            add(tin[u], val - prev);
+            add(tout[u], prev - val);
+            a[u] = val;
         }
         else{
-            int s;
-            cin>>s;
-            s--;
+            int u;
+            cin>>u;
+            u--;
             // root to node sum
-            cout<<sum(tin[s])<<'\n';
+            cout<<query(tin[u])<<'\n';
             // for node to node path do sum(a) + sum(b) - 2 * sum(lca(a, b)) + val(lca(a, b))
         }
     }
