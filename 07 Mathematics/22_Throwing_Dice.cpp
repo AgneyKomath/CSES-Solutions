@@ -1,179 +1,74 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-using ll = long long;
-template<class T>
-constexpr T power(T a, ll b, T res = 1) {
-    for (; b; b /= 2, a *= a) {
-        if (b & 1)
-            res *= a;
-    }
-    return res;
-}
+const int mod = 1e9 + 7;
 
-template<ll P>
-constexpr ll mulMod(ll a, ll b) {
-    return (a * b) % P;
-}
+template<typename T, int N>
+struct Matrix{
+    T m[N][N];
 
-template<ll P>
-struct ModInt {
-    ll x;
-
-    constexpr ModInt() : x(0) {}
-
-    template<std::integral T>
-    constexpr ModInt(T x_) {
-        ll modVal = P;
-        ll v = x_ % modVal;
-        if (v < 0)
-            v += modVal;
-        x = v;
-    }
-
-    constexpr static ll mod() { return P; }
-
-    constexpr ll val() const { return x; }
-
-    constexpr ModInt operator-() const {
-        return ModInt(x == 0 ? 0 : P - x);
-    }
-
-    constexpr ModInt inv() const {
-        return power(*this, P - 2);
-    }
-
-    constexpr ModInt &operator*=(const ModInt &rhs) {
-        x = mulMod<P>(x, rhs.x);
-        return *this;
-    }
-    constexpr ModInt &operator+=(const ModInt &rhs) {
-        x += rhs.x;
-        if (x >= P)
-            x -= P;
-        return *this;
-    }
-    constexpr ModInt &operator-=(const ModInt &rhs) {
-        x -= rhs.x;
-        if (x < 0)
-            x += P;
-        return *this;
-    }
-    constexpr ModInt &operator/=(const ModInt &rhs) {
-        return *this *= rhs.inv();
-    }
-
-    friend constexpr ModInt operator*(ModInt lhs, const ModInt &rhs) {
-        lhs *= rhs;
-        return lhs;
-    }
-    friend constexpr ModInt operator+(ModInt lhs, const ModInt &rhs) {
-        lhs += rhs;
-        return lhs;
-    }
-    friend constexpr ModInt operator-(ModInt lhs, const ModInt &rhs) {
-        lhs -= rhs;
-        return lhs;
-    }
-    friend constexpr ModInt operator/(ModInt lhs, const ModInt &rhs) {
-        lhs /= rhs;
-        return lhs;
-    }
-
-    friend std::istream &operator>>(std::istream &is, ModInt &a) {
-        ll t;
-        is >> t;
-        a = ModInt(t);
-        return is;
-    }
-    friend std::ostream &operator<<(std::ostream &os, const ModInt &a) {
-        return os << a.val();
-    }
-
-    friend constexpr bool operator==(const ModInt &lhs, const ModInt &rhs) {
-        return lhs.x == rhs.x;
-    }
-    friend constexpr std::strong_ordering operator<=>(const ModInt &lhs, const ModInt &rhs) {
-        return lhs.x <=> rhs.x;
-    }
-};
-
-using Z = ModInt<1000000007>;
-
-template<typename T>
-struct Mat{
-
-    static vector<vector<T>> identity(int n){
-        vector<vector<T>> res(n, vector<T>(n, 0));
-        for(int i = 0; i<n; i++) res[i][i] = 1;
+    static Matrix ident(){
+        Matrix res{};
+        for(int i = 0; i < N; i++){
+            res.m[i][i] = T(1);
+        }
         return res;
     }
 
-    static vector<vector<T>> multiply(vector<vector<T>> &a, vector<vector<T>> &b){
-        int n = a.size(), w = a[0].size(), m = b[0].size();
-        vector<vector<T>> res(n, vector<T>(m));
-        for(int i = 0; i<n; i++){
-            for(int j = 0; j<m; j++){
-                for(int k = 0; k<w; k++){
-                    res[i][j] += a[i][k] * b[k][j];
+    // Modify
+    Matrix operator*(const Matrix &b) const{
+        Matrix res{};
+        for(int i = 0; i<N; i++){
+            for(int j = 0; j<N; j++){
+                res.m[i][j] = 0;
+                for(int k = 0; k<N; k++){
+                    res.m[i][j] += m[i][k] * b.m[k][j];
+                    res.m[i][j] %= mod;
                 }
             }
         }
         return res;
     }
-    
-    static vector<T> multiply(vector<T> &a, vector<vector<T>> &b){
-        int w = a.size(), m = b[0].size();
-        vector<T> res(m);
-        for(int j = 0; j<m; j++){
-            for(int k = 0; k<w; k++){
-                res[j] += a[k] * b[k][j];
-            }
-        }
-        return res;
-    }
 
-    static vector<vector<T>> power(vector<vector<T>> &a, long long b){
-        int n = a.size();
-        vector<vector<T>> res = identity(n);
-        while(b>0){
-            if(b&1) res = multiply(res, a);
-            a = multiply(a, a);
-            b /= 2;
+    Matrix power(long long b){
+        Matrix a = *this;
+        Matrix res = ident();
+        for(; b; a = a * a, b /= 2){
+            if(b & 1) res = res * a;
         }
         return res;
     }
 
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
-    
-    int n;
+
+    long long n;
     cin>>n;
 
-    Mat<Z> mat;
-
-    // Fk = Fk-1 + Fk-2 + Fk-3 + Fk-4 + Fk-5 + Fk-6
-    // Rest Fk-1 = Fk-2;
-    vector<vector<Z>> base{
+    Matrix<long long, 6> base({
         {1, 1, 0, 0, 0, 0},
         {1, 0, 1, 0, 0, 0},
         {1, 0, 0, 1, 0, 0},
         {1, 0, 0, 0, 1, 0},
         {1, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0}
-    };
+    });
 
-    vector<vector<Z>> res = mat.power(base, n);
+    /*
+    Transition
+    m[0][0] = m[0][0] + m[0][1] + m[0][2] + m[0][3] + m[0][4] + m[0][5]
+    m[0][1] = m[0][0]
+    m[0][2] = m[0][1]
+    m[0][3] = m[0][2]
+    m[0][4] = m[0][3]
+    m[0][5] = m[0][4]
+    */
 
-    cout<<res[0][0];
-    
+    auto res = base.power(n);
+    cout<<res.m[0][0];
+
     return 0;
 }

@@ -1,43 +1,46 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-static const int mod = 1e9 + 7;
-long long power(long long a, long long b){
-    long long res = 1;
-    for(; b; b/=2, a = a * a % mod){
-        if(b&1) res = res * a % mod;
+const int mod = 1e9 + 7;
+
+int power(int a, int b){
+    int res = 1;
+    for(; b; a = 1ll * a * a % mod, b = b/2){
+        if(b & 1) res = (1ll * res * a) % mod;
     }
     return res;
+}
+
+int inv(int n){
+    return power(n, mod-2);
 }
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
+    // answer is n! / (cnt(a)! * cnt(b)! * ... * cnt(z)!)
 
     string s;
     cin>>s;
 
     int n = s.size();
 
-    vector<int> facs(n+1), invfacs(n+1);
-    facs[0] = 1;
-    for(int i = 1; i<=n; i++) facs[i] = 1ll * facs[i-1] * i % mod;
-    invfacs[n] = power(facs[n], mod-2);
-    for(int i = n-1; i>=0; i--) invfacs[i] = 1ll * invfacs[i+1] * (i+1) % mod;
+    vector<int> fact(n+1);
+    fact[0] = 1;
+    for(int i = 1; i<=n; i++){
+        fact[i] = 1ll * fact[i-1] * i % mod;
+    }
 
     int freq[26]{};
     for(char c:s) freq[c-'a']++;
-    long long res = facs[n];
-    for(int i:freq){ 
-        res = res * invfacs[i] % mod;
+
+    int res = fact[n];
+    for(int i:freq){
+        res = 1ll * res * inv(fact[i]) % mod;
     }
 
     cout<<res;
-    
+
     return 0;
 }

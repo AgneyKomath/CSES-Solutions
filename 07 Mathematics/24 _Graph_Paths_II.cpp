@@ -1,55 +1,70 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-const int INF = 2e18;
+const long long INF = 2e18;
 
-vector<vector<int>> multiply(vector<vector<int>> &a, vector<vector<int>> &b){
-    int n = a.size(), w = b.size(), m = b[0].size();
-    vector<vector<int>> res(n, vector<int>(m, INF));
-    for(int i = 0; i<n; i++){
-        for(int j = 0; j<m; j++){
-            for(int k = 0; k<w; k++){
-                res[i][j] = min(res[i][j], a[i][k] + b[k][j]);
+template<typename T, int N>
+struct Matrix{
+    T m[N][N];
+
+    static Matrix ident(){
+        Matrix res{};
+        for(int i = 0; i<N; i++){
+            for(int j = 0; j<N; j++){
+                if(i != j) res.m[i][j] = INF;
             }
         }
+        return res;
     }
-    return res;
-}
 
-vector<vector<int>> power(vector<vector<int>> &a, int b){
-    int n = a.size();
-    vector<vector<int>> res(n, vector<int>(n, INF));
-    for(int i = 0; i<n; i++) res[i][i] = 0;
-    for(; b>0; b /= 2, a=multiply(a, a)){
-        if(b&1) res = multiply(res, a); 
+    // Modify
+    Matrix operator*(const Matrix &b) const{
+        Matrix res{};
+        for(int i = 0; i<N; i++){
+            for(int j = 0; j<N; j++){
+                res.m[i][j] = INF;
+                for(int k = 0; k<N; k++){
+                    res.m[i][j] = min(res.m[i][j], m[i][k] + b.m[k][j]);
+                }
+            }
+        }
+        return res;
     }
-    return res;
-}
 
-int32_t main(){
+    Matrix power(long long b){
+        Matrix a = *this;
+        Matrix res = ident();
+        for(; b; a = a * a, b /= 2){
+            if(b & 1) res = res * a;
+        }
+        return res;
+    }
+
+};
+
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, m, k;
     cin>>n>>m>>k;
-    vector<vector<int>> base(n, vector<int>(n, INF));
-    for(int i = 0; i<m; i++){
-        int u, v, c;
-        cin>>u>>v>>c;
-        u--;v--;
-        base[u][v] = min(base[u][v], c);
+
+    Matrix<long long, 100> base{};
+    for(int i = 0; i<100; i++){
+        for(int j = 0; j<100; j++){
+            base.m[i][j] = INF;
+        }
     }
 
-    auto res = power(base, k);
+    for(int i = 0; i<m; i++){
+        int u, v, w;
+        cin>>u>>v>>w;
+        u--;v--;
+        base.m[u][v] = min(base.m[u][v], (long long) w);
+    }
     
-    int ans = (res[0][n-1]==INF?-1:res[0][n-1]);
+    auto res = base.power(k);
+    cout<<(res.m[0][n-1]==INF?-1:res.m[0][n-1]);
 
-    cout<<ans;
-    
     return 0;
 }
