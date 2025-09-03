@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
 struct DSU{
@@ -7,65 +6,67 @@ struct DSU{
 
     DSU(int n){
         f.resize(n);
-        siz.resize(n,1);
-        iota(f.begin(), f.end(), 0);
+        siz.assign(n,1);
+        iota(f.begin(),f.end(),0ll);
     }
 
     int find(int x){
-        if(x!=f[x]) f[x] = find(f[x]);
+        if(f[x] != x){
+            f[x] = find(f[x]);
+        }
         return f[x];
+    }
+
+    bool same(int x, int y){
+        return find(x) == find(y);
     }
 
     bool merge(int x, int y){
         x = find(x);
         y = find(y);
-        if(x==y) return false;
-
-        if(f[y]>f[x]) swap(x,y);
+        
+        if(x==y){
+            return false;
+        }
+        if(siz[y]>siz[x]){
+            swap(x,y);
+        }
         f[y] = x;
+
         siz[x] += siz[y];
         return true;
     }
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
-    int n,m;
+    int n, m;
     cin>>n>>m;
     
-    vector<array<int,3>> edges(m);
-
-    for(int i = 0;i<m;i++){
-        int a, b, c;
-        cin>>a>>b>>c;
-        a--;
-        b--;
-        edges.push_back({c, a, b});
+    vector<array<int, 3>> edges(m);
+    for(auto &[w, u, v]:edges){
+        cin>>u>>v>>w;
+        u--;v--;
     }
+
     sort(edges.begin(), edges.end());
 
+    long long res = 0;
+    int cnt = n;
+
     DSU dsu(n);
-    int comps = n;
-    int res = 0;
-    for(auto &[d, a, b]:edges){
-        if(dsu.merge(a,b)){
-            res += d;
-            comps--;
+
+    for(auto [w, u, v]:edges){
+        if(dsu.merge(u, v)){
+            res += w;
+            if(--cnt==1) break;
         }
     }
 
-    if(comps != 1){
-        cout<<"IMPOSSIBLE";
-        return 0;
-    }
-
-    cout<<res;
-
+    if(cnt>1) cout<<"IMPOSSIBLE";
+    else cout<<res;
+    
     return 0;
 }

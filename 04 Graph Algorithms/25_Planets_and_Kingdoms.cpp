@@ -1,9 +1,8 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
-struct Kosaraju{
-    //Kosaraju by Fusion15
+struct SCC{
+    //SCC by Fusion15
     vector<vector<int>> adj, rev;
     vector<int> path;
     vector<int> comp;
@@ -18,7 +17,7 @@ struct Kosaraju{
         }
     }
 
-    Kosaraju(vector<vector<int>> &a){
+    SCC(vector<vector<int>> &a){
         n = a.size();
         adj = a;
         rev.resize(n);
@@ -69,29 +68,25 @@ struct Kosaraju{
     }
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, m;
     cin>>n>>m;
 
     vector<vector<int>> adj(n);
-    for(int i = 0;i<m;i++){
+    for(int i = 0; i<m; i++){
         int u, v;
         cin>>u>>v;
         u--;v--;
         adj[u].push_back(v);
     }
-
-    Kosaraju ksj(adj);
     
-    cout<<ksj.comps.size()<<'\n';
-    for(auto i:ksj.comp) cout<<i+1<<" ";
+    SCC scc(adj);
+
+    cout<<scc.comps.size()<<'\n';
+    for(int i:scc.comp) cout<<i+1<<' ';
     
     return 0;
 }

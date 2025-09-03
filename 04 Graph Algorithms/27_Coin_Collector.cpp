@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
 
 struct SCC{
@@ -69,13 +68,9 @@ struct SCC{
     }
 };
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    #ifdef Fusion15
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-    #endif
 
     int n, m;
     cin>>n>>m;
@@ -95,9 +90,9 @@ int32_t main(){
     int sz = scc.comps.size();
 
     vector<set<int>> adj(sz);
-    vector<int> coins(sz, 0);
+    vector<long long> coins(sz, 0);
     
-    for(int i = 0;i<n;i++){
+    for(int i = 0; i<n; i++){
         int id = scc.comp[i];
         coins[id] += coinsog[i];
         for(auto j:adjog[i]){
@@ -106,21 +101,21 @@ int32_t main(){
         }
     }
 
-    vector<int> dp(sz, -1);
+    vector<long long> dp(sz, -1);
 
-    auto dfs = [&](int node, auto &&self){
-        if(dp[node]!=-1) return dp[node];
+    auto dfs = [&](int u, auto &&dfs){
+        if(dp[u]!=-1) return dp[u];
 
-        int res = 0;
-        for(auto j:adj[node]){
-            res = max(res, self(j, self));
+        dp[u] = 0;
+        for(auto v:adj[u]){
+            dp[u] = max(dp[u], dfs(v, dfs));
         }
-        res += coins[node];
-        return dp[node] = res;
+        dp[u] += coins[u];
+        return dp[u];
     };
 
-    int res = 0;
-    for(int i = 0;i<sz;i++){
+    long long res = 0;
+    for(int i = 0; i<sz; i++){
         res = max(res, dfs(i, dfs));
     }
 
