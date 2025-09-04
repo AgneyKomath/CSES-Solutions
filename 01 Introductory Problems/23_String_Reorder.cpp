@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     

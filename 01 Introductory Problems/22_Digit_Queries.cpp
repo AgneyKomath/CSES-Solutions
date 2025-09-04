@@ -20,7 +20,7 @@ int solve(long long x){
     return to_string(lastNum)[x]-'0';
 }
 
-int32_t main(){
+int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 

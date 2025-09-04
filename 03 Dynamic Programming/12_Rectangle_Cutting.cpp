@@ -8,8 +8,6 @@ int main(){
     int n, m;
     cin>>n>>m;
 
-    if(n>m) swap(n, m);
-
     vector<vector<int>> dp(n+1, vector<int>(m+1, 1e9));
 
     for(int i = 1; i<=n; i++){
