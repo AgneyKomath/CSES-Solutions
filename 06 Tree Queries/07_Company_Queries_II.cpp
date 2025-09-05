@@ -1,98 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Tree{
-    int root;
-    int log2dist, n;
-    vector<vector<int>> adj, pow2ends;
-    vector<int> parent, depth;
-
-    void process(int curr, int prev){
-        depth[curr] = depth[prev] + 1;
-        for(int i:adj[curr]){
-            if(i==prev) continue;
-            process(i, curr);
-            parent[i] = curr;
-        }
-    }
-
-    void build(){
-        for(int i = 0; i<n; i++){
-            pow2ends[i][0] = parent[i];
-        }
-
-        for(int p = 1; p<=log2dist; p++){
-            for(int i = 0; i<n; i++){
-                int mid = pow2ends[i][p-1];
-                if(mid==-1){
-                    pow2ends[i][p] = -1;
-                }
-                else{
-                    pow2ends[i][p] = pow2ends[mid][p-1];
-                }
-            }
-        }
-    }
-
-    Tree(const vector<vector<int>> &a, int r = 0){
-        adj = a;
-        n = adj.size();
-        log2dist =ceil(log2(n));
-        parent.resize(n);
-        depth.resize(n);
-        pow2ends.resize(n, vector<int>(log2dist+1));
-
-        root = r;
-        parent[root] = -1;
-        depth[root] = -1;
-
-        process(root, root);
-        build();
-    }
-
-    int kth_ancestor(int node, int k){
-        if(k>n) return -1;
-        for(int pow = 0; pow<=log2dist; pow++){
-            if((k&(1<<pow))){
-                node = pow2ends[node][pow];
-                if(node==-1) break;
-            }
-        }
-        return node;
-    }
-
-    int lca(int node1, int node2){
-        if(depth[node1]<depth[node2]) swap(node1, node2);
-        
-        node1 = kth_ancestor(node1, depth[node1] - depth[node2]);
-
-        if(node1==node2){
-            return node2;
-        }
-        
-        for(int i = log2dist; i>=0; i--){
-            if(pow2ends[node1][i] != pow2ends[node2][i]){
-                node1 = pow2ends[node1][i];
-                node2 = pow2ends[node2][i];
-            }
-        }
-
-        return pow2ends[node1][0];
-    }
-
-    int distance(int node1, int node2){
-        int ancestor = lca(node1, node2);
-        int res = depth[node1] + depth[node2] - 2*depth[ancestor];
-        return res;
-    }
-
-    bool is_ancestor(int node1, int node2){
-        bool res = lca(node1, node2) == node1;
-        return res;
-    }
-
-};
-
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
@@ -100,24 +8,68 @@ int main(){
     int n, q;
     cin>>n>>q;
 
+    int log = __lg(n) + 1;
+
     vector<vector<int>> adj(n);
-    for(int i = 1;i<n;i++){
-        int p;
-        cin>>p;
-        p--;
-        adj[i].push_back(p);
-        adj[p].push_back(i);
+    vector<vector<int>> jump(log, vector<int>(n, -1));
+    for(int i = 1; i<n; i++){
+        cin>>jump[0][i];
+        jump[0][i]--;
+        adj[jump[0][i]].push_back(i);
     }
 
-    Tree tr(adj, 0);
-    
+    for(int i = 1; i<log; i++){
+        for(int j = 0; j<n; j++){
+            int v = jump[i-1][j];
+            if(v==-1) continue;
+            jump[i][j] = jump[i-1][v];
+        }
+    }
+
+    vector<int> depth(n, 0);
+    auto dfs = [&](int u, auto &&dfs)->void{
+        for(int v:adj[u]){
+            if(v != jump[0][u]){
+                depth[v] = 1 + depth[u];
+                dfs(v, dfs);
+            }
+        }
+    };
+    dfs(0, dfs);
+
+    auto kth_ancestor = [&](int u, int k){
+        for(int i = log-1; i>=0 && u != -1; i--){
+            if(k&(1<<i)) u = jump[i][u];
+        }
+        return u;
+    };
+
+    auto lca = [&](int u, int v){
+        if(depth[u]<depth[v]) swap(u, v);
+
+        // Make Them Same Level First
+        u = kth_ancestor(u, depth[u] - depth[v]);
+        
+        if(u==v) return u;
+
+        // While Jumps are not same lift them. At the end the parent will be the LCA
+        for(int i = log-1; i>=0; i--){
+            if(jump[i][u] != jump[i][v]){
+                u = jump[i][u];
+                v = jump[i][v];
+            }
+        }
+        
+        return jump[0][u];
+    };
+
     while(q--){
         int u, v;
         cin>>u>>v;
         u--;v--;
-        cout<<tr.lca(u, v)+1<<'\n';
+
+        cout<<lca(u, v) + 1<<'\n';
     }
-    
-    
+
     return 0;
 }

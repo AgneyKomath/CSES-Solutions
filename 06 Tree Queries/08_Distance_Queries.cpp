@@ -1,6 +1,78 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+struct Tree{
+    // Tree Struct by Fusion15
+    int root, log, n;
+    vector<vector<int>> adj, jump;
+    vector<int> depth, parent;
+
+    void dfs(int u){
+        for(int v:adj[u]){
+            if(v != parent[u]){
+                parent[v] = u;
+                depth[v] = 1 + depth[u];
+                dfs(v);
+            }
+        }
+    }
+
+    void build(){
+        for(int i = 0; i<n; i++) jump[i][0] = parent[i];
+        for(int i = 1; i<log; i++){
+            for(int u = 0; u<n; u++){
+                int v = jump[u][i-1];
+                if(v==-1) continue;
+                jump[u][i] = jump[v][i-1];
+            }
+        }
+    }
+
+    Tree(vector<vector<int>> & a, int r = 0){
+        adj = a;
+        n = adj.size();
+        log = __lg(n) + 1;
+        root = r;
+
+        jump.assign(n, vector<int>(log, -1));
+        parent.assign(n, -1);
+        depth.assign(n, 0);
+
+        dfs(root);
+        build();
+    }
+
+    int kth_ancestor(int u, int k){
+        if(k>depth[u]) return -1;
+        for(int i = log-1; i>=0; i--){
+            if(k & (1<<i)) u = jump[u][i];
+        }
+        return u;
+    }
+
+    int lca(int u, int v){
+        if(depth[u]<depth[v]) swap(u, v);
+        u = kth_ancestor(u, depth[u] - depth[v]);
+        if(u==v) return u;
+        for(int i = log-1; i>=0; i--){
+            if(jump[u][i] != jump[v][i]){
+                u = jump[u][i];
+                v = jump[v][i];
+            }
+        }
+        return jump[u][0];
+    }
+
+    int distance(int u, int v){
+        int ancestor = lca(u, v);
+        return depth[u] + depth[v] - 2 * depth[ancestor];
+    }
+
+    bool is_ancestor(int u, int v){
+        return lca(u, v) == u;
+    }
+};
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
@@ -17,57 +89,13 @@ int main(){
         adj[v].push_back(u);
     }
 
-    int mxLog = __lg(n) + 1;
-
-    vector<vector<int>> jump(n, vector<int>(mxLog+1));
-
-    vector<int> depth(n, 0);
-    auto dfs = [&](int u, int p, auto &&dfs)->void{
-        jump[u][0] = p; 
-        for(int v:adj[u]){
-            if(v==p) continue;
-            depth[v] = depth[u] + 1;
-            dfs(v, u, dfs);
-        }
-    };
-    dfs(0, -1, dfs);
-
-    for(int p = 1; p<=mxLog; p++){
-        for(int u = 0; u<n; u++){
-            int mid = jump[u][p-1];
-            jump[u][p] = (mid == -1 ? -1 : jump[mid][p-1]);
-        }
-    }
-
-    auto kth_ancestor = [&](int u, int k){
-        for(int p = 0; p<=mxLog; p++){
-            if((k&(1<<p))){
-                u = jump[u][p];
-                if(u==-1) break;
-            }
-        }
-        return u;
-    };
-
-    auto lca = [&](int u, int v){
-        if(depth[u]<depth[v]) swap(u, v);
-        u = kth_ancestor(u, depth[u] - depth[v]);
-        if(u==v) return v;
-        for(int i = mxLog; i>=0; i--){
-            if(jump[u][i] != jump[v][i]){
-                u = jump[u][i];
-                v = jump[v][i];
-            }
-        }
-        return jump[u][0];
-    };
+    Tree tr(adj);
 
     while(q--){
         int u, v;
         cin>>u>>v;
         u--;v--;
-        int res = depth[u] + depth[v] - 2*depth[lca(u, v)];
-        cout<<res<<'\n';
+        cout<<tr.distance(u, v)<<'\n';
     }
 
     return 0;
