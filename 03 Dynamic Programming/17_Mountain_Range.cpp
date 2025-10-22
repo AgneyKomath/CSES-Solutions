@@ -1,43 +1,48 @@
 #include <bits/stdc++.h>
 using namespace std;
- 
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    
-	int n;
-	cin>>n;
-	vector<int> h(n);
-	for(int &i:h) cin>>i;
-	
-	vector<int> left(n, -1), right(n, -1);
-	vector<int> st;
-	for(int i = 0; i<n; i++){
-	    while(!st.empty() && h[st.back()]<=h[i]) st.pop_back();
-	    if(!st.empty()) left[i] = st.back();
-	    st.push_back(i);
-	}
-	st.clear();
-	for(int i = n-1; i>=0; i--){
-	    while(!st.empty() && h[st.back()]<=h[i]) st.pop_back();
-	    if(!st.empty()) right[i] = st.back();
-	    st.push_back(i);
-	}
 
-	vector<pair<int, int>> a(n);
-	for(int i = 0; i<n; i++) a[i] = {h[i], i};
-	sort(a.begin(), a.end());
+    int n;
+    cin>>n;
 
-	vector<int> dp(n, 1);
-	for(auto [v, i]:a){
-	    if(left[i]!=-1){
-	        dp[left[i]] = max(dp[left[i]], 1 + dp[i]);
-	    }
-	    if(right[i]!=-1){
-	        dp[right[i]] = max(dp[right[i]], 1 + dp[i]);
-	    }
-	}
-    
-	int res = *max_element(dp.begin(), dp.end());
-	cout<<res;
+    vector<int> a(n);
+    for(int &i : a) cin>>i;
+
+    vector<int> left(n), right(n);
+
+    vector<int> stack;
+    for(int i = 0; i < n; i++){
+        while(!stack.empty() && a[stack.back()] <= a[i]) stack.pop_back();
+        left[i] = stack.empty() ? -1 : stack.back();
+        stack.push_back(i);
+    }
+
+    stack.clear();
+    for(int i = n - 1; i >= 0; i--){
+        while(!stack.empty() && a[stack.back()] <= a[i]) stack.pop_back();
+        right[i] = stack.empty() ? -1 : stack.back();
+        stack.push_back(i);
+    }
+
+    // This is basically a DAG. Problem reduces to longest path in DAG
+    vector<int> dp(n, -1);
+
+    auto dfs = [&](int id, auto &&dfs){
+        if(id == -1) return 0;
+        if(dp[id] != -1) return dp[id];
+        dp[id] = 1 + max(dfs(left[id], dfs), dfs(right[id], dfs));
+        return dp[id];
+    };
+
+    int res = 1;
+    for(int i = 0; i < n; i++){
+        res = max(res, dfs(i, dfs));
+    }
+
+    cout<<res;
+
+    return 0;
 }

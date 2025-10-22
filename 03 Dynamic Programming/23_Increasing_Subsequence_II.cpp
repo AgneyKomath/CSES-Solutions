@@ -9,40 +9,40 @@ int main(){
 
     int n;
     cin>>n;
+
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
     // Coordinate Compression
     vector<int> b(a);
     sort(b.begin(), b.end());
     b.erase(unique(b.begin(), b.end()), b.end());
-    for(int &i:a){ 
+    for(int &i : a){ 
         i = lower_bound(b.begin(), b.end(), i) - b.begin();
     }
-
     int sz = b.size();
-    
+
     // Fenwick Tree
-    vector<int> tree(sz+1, 0);
-    auto add = [&](int ind, int val){
-        for(int i = ind+1; i<=sz;i += i&-i){
+    vector<int> tree(sz + 1, 0);
+    auto add = [&](int id, int val){
+        for(int i = id + 1; i <= sz; i += i & -i){
             tree[i] = (tree[i] + val) % mod;
         }
     };
-    auto sum = [&](int ind){
+    auto sum = [&](int id){
         int res = 0;
-        for(int i = ind+1; i; i -= i&-i){
+        for(int i = id + 1; i; i -= i & -i){
             res = (res + tree[i]) % mod;
         }
         return res;
     };
 
-    for(int i:a){
-        int v = sum(i-1);
-        add(i, v+1);
+    for(int i : a){
+        int v = sum(i - 1);
+        add(i, v + 1);
     }
-    
-    cout<<sum(sz-1);
-    
+
+    cout<<sum(sz - 1);
+
     return 0;
 }

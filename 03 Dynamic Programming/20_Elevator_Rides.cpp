@@ -9,13 +9,13 @@ int main(){
     cin>>n>>x;
     
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
     
     // min number of rides then min number of current weight
-    vector<pair<int, int>> dp(1<<n, {1e9, 1e9});
+    vector<pair<int, int>> dp(1 << n, {1e9, 1e9});
     dp[0] = {0, 0}; 
     for(int mask = 1; mask < (1 << n); mask++){
-        for(int i = 0; i<n; i++){
+        for(int i = 0; i < n; i++){
             if(!((mask >> i) & 1)) continue;
             int newMask = mask & ~(1 << i);
             int rides = dp[newMask].first + (dp[newMask].second + a[i] > x);

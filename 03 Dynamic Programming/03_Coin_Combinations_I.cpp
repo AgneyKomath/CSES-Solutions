@@ -1,26 +1,27 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-static const int mod = 1e9 + 7;
+const int mod = 1e9 + 7;
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    
+
     int n, x;
     cin>>n>>x;
 
-    vector<int> c(n);
-    for(int &i:c) cin>>i;
+    vector<int> coins(n);
+    for(int &i : coins) cin>>i;
 
-    int dp[x+1];
+    vector<int> dp(x + 1, 0);
     dp[0] = 1;
-    for(int j = 1; j<=x; j++){
-        dp[j] = 0;
-        for(int i:c){
-            if(j >= i) dp[j] = (dp[j] + dp[j-i]) % mod;
+
+    for(int i = 1; i <= x; i++){
+        for(int j : coins){
+            if(i >= j) dp[i] = (dp[i] + dp[i - j]) % mod;
         }
     }
+
     cout<<dp[x];
 
     return 0;

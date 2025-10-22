@@ -4,23 +4,23 @@ using namespace std;
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    
+
     int n, x;
     cin>>n>>x;
 
-    vector<int> prices(n), pages(n);
-    for(int &i:prices) cin>>i;
-    for(int &i:pages) cin>>i;
+    vector<int> cost(n), value(n);
+    for(int &i : cost) cin>>i;
+    for(int &i : value) cin>>i;
 
-    vector<int> dp(x+1, 0);
-
-    for(int j = 0; j<n; j++){
-        for(int i = x; i>=prices[j]; i--){
-            dp[i] = max(dp[i], dp[i-prices[j]] + pages[j]);
+    vector<int> dp(x + 1, 0);
+    
+    for(int i = 0; i < n; i++){
+        for(int j = x; j >= cost[i]; j--){
+            dp[j] = max(dp[j], value[i] + dp[j - cost[i]]);
         }
     }
 
     cout<<dp[x];
-    
+
     return 0;
 }

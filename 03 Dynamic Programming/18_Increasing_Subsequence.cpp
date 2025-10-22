@@ -12,25 +12,11 @@ int main(){
 
     //Binary Search Solution O(nlogn)
     vector<int> lis;
-    for(int i:a){
-        auto it = lower_bound(lis.begin(), lis.end(),i);
-        if(it==lis.end()) lis.push_back(i);
-        else *it = i;
+    for(int i : a){
+        if(lis.empty() || lis.back() < i) lis.push_back(i);
+        else *lower_bound(lis.begin(), lis.end(), i) = i;
     }
     cout<<lis.size();
-    
-    // //DP Solution O(n^2) TLE
-    // int res=1;
-    // int dp[n];
-    // for(int i=0;i<n;i++){
-    //     dp[i] = 1;
-    //     for(int j=i-1;j>=0;j--){
-    //         if(a[j]>=a[i]) continue;
-    //         dp[i] = max(dp[i],dp[j]+1);
-    //     }
-    //     res = max(res,dp[i]);
-    // }
-    // cout<<res;
 
     return 0;
 }
@@ -98,21 +84,21 @@ int main(){
 //     cin>>n;
 
 //     vector<int> a(n);
-//     for(int &i:a) cin>>i;
+//     for(int &i : a) cin>>i;
 
 //     vector<int> b(a);
 //     sort(b.begin(), b.end());
 //     b.erase(unique(b.begin(), b.end()), b.end());
-//     for(int &i:a) i = lower_bound(b.begin(), b.end(), i) - b.begin();
+//     for(int &i : a) i = lower_bound(b.begin(), b.end(), i) - b.begin();
 //     int sz = b.size();
     
 //     SegTree st(sz);
-//     for(int i:a){
-//         int mx = st.query(0, i-1);
-//         st.update(i, mx+1);
+//     for(int i : a){
+//         int mx = st.query(0, i - 1);
+//         st.update(i, mx + 1);
 //     }
 
-//     cout<<st.query(0, sz-1);
+//     cout<<st.query(0, sz - 1);
 
 //     return 0;
 // }

@@ -1,40 +1,49 @@
 #include <bits/stdc++.h>
 using namespace std;
- 
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
+    int n;
+    cin>>n;
 
-	int n;
-	cin>>n;
-	vector<string> a(n);
-	for(auto &i:a) cin>>i;
-	
-	string res;
-	vector<vector<bool>> vis(n, vector<bool>(n, 0));
-	vector<pair<int, int>> q, nq;
-	q.push_back({0, 0});
-	vis[0][0] = 1;
-	while(!q.empty()){
-        char smallest = 'Z';
-	    for(auto &[r, c]:q) smallest = min(smallest, a[r][c]);
-	    res.push_back(smallest);
- 
-        nq.clear();
-	    for(auto &[r, c]:q){
-	        if(a[r][c]!=smallest) continue;
-	        if(r!=n-1 && !vis[r+1][c]) {
-	            vis[r+1][c] = 1;
-	            nq.emplace_back(r+1, c);
-	        }
-	        if(c!=n-1 && !vis[r][c+1]){
-	            vis[r][c+1] = 1;
-	            nq.emplace_back(r, c+1);
-	        } 
-	    }
-	    swap(q, nq);
-	}
-	cout<<res;
+    vector<string> a(n);
+    for(auto &i : a) cin>>i;
+
+    string res;
+    res += a[0][0];
+
+    vector<pair<int, int>> prev, curr;
+    prev.emplace_back(0, 0);
+    vector<vector<int>> vis(n, vector<int>(n, 0));
+    vis[0][0] = 1;
+    char mn;
+
+    auto update = [&](int r, int c){
+        if(r == n || c == n || vis[r][c]) return;
+        vis[r][c] = 1;
+        if(a[r][c] < mn){
+            mn = a[r][c];
+            curr.clear();
+        }
+        if(a[r][c] == mn){
+            curr.emplace_back(r, c);
+        }
+    };
+
+    for(int i = 0; i < 2 * n - 2; i++){
+        mn = 'Z' + 1;
+
+        for(auto [r, c] : prev){
+            update(r + 1, c);
+            update(r, c + 1);
+        }
+        
+        res += mn;
+        swap(prev, curr);
+    }
+
+    cout<<res;
 
     return 0;
 }
