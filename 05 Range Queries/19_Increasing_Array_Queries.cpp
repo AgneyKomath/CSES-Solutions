@@ -1,61 +1,38 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct SegTree {
-    //Segment Tree by Fusion15
-    vector<int> tree;
-    vector<int> arr;
-    int n;
+// Sparse Table that stores rightmost index of max values
+struct SparseTable {
+    vector<vector<int>> table;
+    vector<int> a;
 
-    //Change
-    int neutral = 0;
-    int merge(int a, int b) {
-        return max(a, b);
+    int merge(int i, int j){
+        if(a[i] == a[j]) return i > j ? i : j;
+        return a[i] > a[j] ? i : j;
     }
 
-    void build(int node, int start, int end) {
-        if(start == end) tree[node] = arr[start];
-        else{
-            int mid = (start + end) / 2;
-            build(2*node, start, mid);
-            build(2*node+1, mid + 1, end);
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
+    SparseTable(const vector<int>& arr) {
+        a = arr;
+        int n = a.size();
+        int maxLog = __lg(n) + 1;
+
+        table.assign(n, vector<int>(maxLog));
+
+        for (int i = 0; i < n; i++) {
+            table[i][0] = i;
+        }
+
+        for (int j = 1; j < maxLog; j++) {
+            for (int i = 0; i + (1 << j) <= n; i++) {
+                table[i][j] = merge(table[i][j - 1], table[i + (1 << (j - 1))][j - 1]);
+            }
         }
     }
 
-    int query(int node, int start, int end, int L, int R) {
-        if (R < start || L > end) return neutral;
-        if (L <= start && end <= R) return tree[node];
-        int mid = (start + end) / 2;
-        int l = query(2*node, start, mid, L, R);
-        int r = query(2*node+1, mid + 1, end, L, R);
-        return merge(l, r);
-    }
-
-    int nextGreat(int node, int start, int end, int idx, int val){
-        if(end<idx || tree[node]<=val) return n;
-        if(start==end) return start;
-        int mid = (start + end)/2;
-        int l = nextGreat(2*node, start, mid, idx, val);
-        if(l!=n) return l;
-        return nextGreat(2*node+1, mid+1, end, idx, val);
-    };
-
-    SegTree(const vector<int> &a) {
-        n = a.size();
-        tree.resize(4 * n);
-        arr = a;
-        build(1, 0, n - 1);
-    }
-
     int query(int l, int r) {
-        return query(1, 0, n - 1, l, r);
+        int j = __lg(r - l + 1);
+        return merge(table[l][j], table[r - (1 << j) + 1][j]);
     }
-
-    int nextGreat(int idx, int val){
-        return nextGreat(1, 0, n-1, idx, val);
-    }
-
 };
 
 int main(){
@@ -68,39 +45,47 @@ int main(){
     vector<int> a(n);
     for(int &i:a) cin>>i;
 
-    vector<long long> pref(n+1, 0);
-    for(int i = 0; i<n; i++) pref[i+1] = pref[i] + a[i];
+    vector<long long> pref(n + 1, 0);
+    for(int i = 0; i < n; i++) pref[i + 1] = pref[i] + a[i];
     auto sumQuery = [&](int l, int r){
-        if(l>r) return 0ll;
-        return pref[r+1] - pref[l];
+        if(l > r) return 0ll;
+        return pref[r + 1] - pref[l];
     };
 
-    SegTree st(a);
-
-    // min cost to make suffix at i increasing
-    vector<long long> dp(n+1);
+    vector<int> nextGreat(n), stack;
+    // Min cost to make suffix at i increasing
+    vector<long long> dp(n + 1);
     dp[n] = 0;
-    for(int i = n-1; i>=0; i--){
-        // This one can be done without Segment Tree using Monotonic Stack 
-        int id = st.nextGreat(i, a[i]);
-        dp[i] = dp[id] + 1ll * (id - i) * a[i] - sumQuery(i, id-1);
+    for(int i = n - 1; i >= 0; i--){
+        while(!stack.empty() && a[stack.back()] <= a[i]) stack.pop_back();
+        nextGreat[i] = stack.empty() ? n : stack.back();
+        stack.push_back(i);
+
+        int id = nextGreat[i];
+        dp[i] = dp[id] + 1ll * (id - i) * a[i] - sumQuery(i, id - 1);
     }
-    
+
+    SparseTable st(a);
+
+    // O(1) Queries Answer
     while(q--){
         int l, r;
         cin>>l>>r;
-        l--;r--;
+        l--, r--;
 
+        // Base Cost is Cost to make Suffix at l increasing
         long long res = dp[l];
 
-        int mx = st.query(l, r);
-        // first index greater than r that has value greater than mx
-        int id = st.nextGreat(r, mx);
+        int mxid = st.query(l, r);
+        int mx = a[mxid];
 
-        res -= dp[id] + 1ll * (id - r - 1) * mx - sumQuery(r+1, id-1);
+        int id = nextGreat[mxid];
+
+        // Remove Contribution from elements after r
+        res -= dp[id] + 1ll * (id - r - 1) * mx - sumQuery(r + 1, id - 1);
 
         cout<<res<<'\n';
     }  
-    
+
     return 0;
 }
