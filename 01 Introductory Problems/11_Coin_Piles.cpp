@@ -7,17 +7,14 @@ int main(){
 
     int t;
     cin>>t;
+
     while(t--){
-        int a,b;
+        int a, b;
         cin>>a>>b;
 
-        if(a <= 2*b && b <= 2*a && (a + b) % 3 == 0){
-            cout<<"YES\n";
-        }
-        else{
-            cout<<"NO\n";
-        }
+        if((a + b) % 3 != 0 || max(a, b) > 2 * min(a, b)) cout<<"NO\n";
+        else cout<<"YES\n";
     }
-    
+
     return 0;
 }

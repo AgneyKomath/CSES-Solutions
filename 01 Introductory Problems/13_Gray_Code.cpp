@@ -8,22 +8,22 @@ int main(){
     int n;
     cin>>n;
 
-    int len = 1<<n;
+    int len = 1 << n;
 
     vector<string> res(len, string(n, '0'));
 
-    for(int i = 0; i<n; i++){
-        int md = 1<<(i+2);
-        int lb = 1<<i;
-        for(int j = 0; j<len; j++){
+    for(int i = 0; i < n; i++){
+        int md = 1 << (i + 2);
+        int lb = 1 << i;
+        for(int j = 0; j < len; j++){
             if((j % md) >= lb && (j % md) <= (3 * lb - 1)){
-                res[j][n-i-1] = '1';
+                res[j][n - i - 1] = '1';
             }
         }
     }
 
-    for(auto i:res) cout<<i<<'\n';
-    
+    for(auto i : res) cout<<i<<'\n';
+
     return 0;
 }
 

@@ -7,17 +7,15 @@ int main(){
 
     string s;
     cin>>s;
-    
-    int n = s.size();
 
-    int maxLen = 1;
-    for(int i = 1, curr = 1; i<n; i++){
-        if(s[i] == s[i-1]) curr ++;
+    int res = 1;
+    for(int i = 1, curr = 1; i < (int)s.size(); i++){
+        if(s[i] == s[i - 1]) curr++;
         else curr = 1;
-        maxLen = max(maxLen, curr);
+        res = max(res, curr);
     }
 
-    cout<<maxLen;
-    
+    cout<<res;
+
     return 0;
 }

@@ -2,27 +2,26 @@
 using namespace std;
 
 int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
     int n;
     cin>>n;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
-    
-    long long sum = 0;
-    for(int i:a) sum += i;
+    for(int & i : a) cin>>i;
 
-    long long mnDiff = sum;
-    for(int i = 0; i<(1<<n); i++){
+    long long res = 1e9;
+    for(int i = 0; i < (1 << n); i++){
         long long curr = 0;
-        for(int j = 0; j<n; j++){
-            if(i & (1<<j)){
-                curr += a[j];
-            }
+        for(int j = 0; j < n; j++){
+            if((i >> j) & 1) curr += a[j];
+            else curr -= a[j];
         }
-        mnDiff = min(mnDiff, abs((sum - curr) - curr)) ;
-    }    
+        res = min(res, abs(curr));
+    }
 
-    cout<<mnDiff;
+    cout<<res;
 
     return 0;
 }

@@ -7,23 +7,20 @@ int main(){
 
     int t;
     cin>>t;
+
     while(t--){
-        long long y,x;
+        int y, x;
         cin>>y>>x;
 
-        long long grp = max(y, x);
-        long long mid = grp * (grp - 1) + 1;
+        int grp = max(x, y);
+        long long mid = 1ll * grp * (grp - 1) + 1;
 
-        long long diff = x - y;
+        int diff = x - y;
 
-        long long res;
-
-        if(grp & 1) res = mid + diff;
-        else res = mid - diff; 
+        long long res = grp & 1 ? mid + diff : mid - diff;
 
         cout<<res<<'\n';
     }
 
-    
     return 0;
 }

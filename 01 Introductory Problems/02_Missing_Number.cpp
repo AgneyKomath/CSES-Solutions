@@ -9,13 +9,13 @@ int main(){
     cin>>n;
 
     int res = n;
-    for(int i = 0; i<n-1; i++){
+    for(int i = 1; i <= n - 1; i++){
         int v;
         cin>>v;
-        res -= v;
-        res += i;
+        res += i - v;
     }
+
     cout<<res;
-    
+
     return 0;
 }

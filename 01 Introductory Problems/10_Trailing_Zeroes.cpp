@@ -8,14 +8,13 @@ int main(){
     int n;
     cin>>n;
 
-    int cnt5=0;
-
+    int res = 0;
     while(n){
         n /= 5;
-        cnt5 += n;
+        res += n;
     }
 
-    cout<<cnt5;
-    
+    cout<<res;
+
     return 0;
 }
