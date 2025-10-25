@@ -9,18 +9,19 @@ int main(){
     cin>>n>>x;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
-    long long res = 0, sum = 0;
     map<long long, int> mp;
     mp[0] = 1;
-    for(int i:a){
-        sum += i;
-        res += mp[sum-x];
-        mp[sum]++;
+
+    long long curr = 0, res = 0;
+    for(int i : a){
+        curr += i;
+        res += mp[curr - x];
+        mp[curr]++;
     }
 
     cout<<res;
-    
+
     return 0;
 }

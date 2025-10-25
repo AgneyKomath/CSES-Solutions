@@ -5,51 +5,39 @@ int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int n,m;
-    cin>>n>>m;
+    int n, q;
+    cin>>n>>q;
 
-    vector<int> a(n+1,0),mp(n+2,0);
-    mp[0] = n+1;
-
-    for(int i=1;i<=n;i++){
+    vector<int> a(n + 1, 0), pos(n + 2, 0);
+    for(int i = 1; i <= n; i++){
         cin>>a[i];
-        mp[a[i]] = i;
+        pos[a[i]] = i;
     }
 
-    int res=0;
-    for(int i=1;i<=n;i++){
-        if(mp[i]<mp[i-1]) res++;
+    int cnt = 1;
+    for(int i = 2; i <= n; i++){
+        cnt += pos[i] < pos[i - 1];
     }
 
-    while(m--){
-        int x,y;
-        cin>>x>>y;
+    while(q--){
+        int i, j;
+        cin>>i>>j;
 
-        int xv = a[x];
-        int yv = a[y];
-        swap(a[x],a[y]);
+        int x = a[i], y = a[j];
 
-        if(xv>yv) swap(xv,yv);
+        swap(a[i], a[j]);
+        if(x > y) swap(x, y);
 
-        bool flagBefore1 = (mp[xv-1]<mp[xv]);
-        bool flagBefore2 = (mp[yv-1]<mp[yv]);
-        bool flagBefore3 = (yv-xv==1)?0:(mp[xv]<mp[xv+1]);
-        bool flagBefore4 = (mp[yv]<mp[yv+1]);
+        int s1 = (pos[x - 1] < pos[x]) + (pos[y - 1] < pos[y]) + (y - x == 1 ? 0 : pos[x] < pos[x + 1]) + (pos[y] < pos[y + 1]);
 
-        swap(mp[xv],mp[yv]);
+        swap(pos[x], pos[y]);
 
-        bool flagAfter1 = (mp[xv-1]<mp[xv]);
-        bool flagAfter2 = (mp[yv-1]<mp[yv]);
-        bool flagAfter3 = (yv-xv==1)?0:(mp[xv]<mp[xv+1]);
-        bool flagAfter4 = (mp[yv]<mp[yv+1]);
+        int s2 = (pos[x - 1] < pos[x]) + (pos[y - 1] < pos[y]) + (y - x == 1 ? 0 : pos[x] < pos[x + 1]) + (pos[y] < pos[y + 1]);
 
-        res += flagBefore1 + flagBefore2 + flagBefore3 + flagBefore4 - flagAfter1 - flagAfter2 - flagAfter3 - flagAfter4;
-        
-        cout<<res<<'\n';
+        cnt += s1 - s2;
+
+        cout<<cnt<<'\n';
     }
 
-
-    
-    
     return 0;
 }

@@ -9,29 +9,29 @@ int main(){
     cin>>n>>k;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
     auto check = [&](long long val)->bool{
         int cnt = 1;
         long long curr = 0;
-        for(int i:a){
-            if(curr + i > val){
-                curr = i;
+        for(int i : a){
+            if(i + curr > val){
                 cnt++;
+                curr = 0;
             }
-            else curr += i;
+            curr += i;
         }
-        return cnt<=k;
+        return cnt <= k;
     };
 
     long long lo = *max_element(a.begin(), a.end()), hi = 2e14;
-    while(lo<hi){
+    while(lo < hi){
         long long mid = (lo + hi) / 2;
         if(check(mid)) hi = mid;
-        else lo = mid+1;
+        else lo = mid + 1;
     }
 
     cout<<hi;
-    
+
     return 0;
 }

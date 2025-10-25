@@ -3,30 +3,30 @@ using namespace std;
 
 int main(){
     ios::sync_with_stdio(false);
-	cin.tie(NULL);
+    cin.tie(NULL);
 
-    int x,n;
+    int x, n;
     cin>>x>>n;
 
-    vector<int> p(n);
-    for(int &i:p) cin>>i;
-
+    multiset<int> distances{x};
     set<int> lights{0, x};
-	multiset<int> dist{x};
 
-    for(int val:p){
-        auto it1 = lights.upper_bound(val);
-        auto it2 = it1;
-        it2--;
+    for(int i = 0; i < n; i++){
+        int p;
+        cin>>p;
 
-        dist.erase(dist.find(*it1 - *it2));
-        dist.insert(val - *it2);
-        dist.insert(*it1 - val);
+        int prev = *(--lights.lower_bound(p));
+        int next = *lights.upper_bound(p);
 
-        lights.insert(val);
+        distances.erase(distances.find(next - prev));
 
-        cout<<*dist.rbegin()<<' ';
+        distances.insert(next - p);
+        distances.insert(p - prev);
+
+        lights.insert(p);
+
+        cout<<*distances.rbegin()<<' ';
     }
-    
+
     return 0;
 }

@@ -9,20 +9,20 @@ int main(){
     cin>>n;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
-
-    long long res = 0;
+    for(int &i : a) cin>>i;
 
     vector<int> mp(n, 0);
     mp[0] = 1;
-    int sum = 0;
-    for(int i:a){
-        sum = ((sum + i) % n + n) % n;
-        res += mp[sum];
-        mp[sum]++;
+
+    long long res = 0;
+    int curr = 0;
+    for(int i : a){
+        curr = ((curr + i) % n + n) % n;
+        res += mp[curr];
+        mp[curr]++; 
     }
 
     cout<<res;
-    
+
     return 0;
 }

@@ -38,15 +38,15 @@ int main(){
     cin>>n;
 
     vector<array<int, 3>> a(n);
-    for(int i = 0; i<n; i++){
+    for(int i = 0; i < n; i++){
         int s, e;
         cin>>s>>e;
         a[i] = {s, e, i};
     }
-    
+
     // Coordinate Compression
     vector<int> b;
-    for(auto [s, e, i]:a){
+    for(auto [s, e, i] : a){
         b.push_back(s);
         b.push_back(e);
     }
@@ -57,17 +57,17 @@ int main(){
         s = lower_bound(b.begin(), b.end(), s) - b.begin();
     }
     int sz = b.size();
-    
+
     // sort by end times in ascending then start times in descending
-    sort(a.begin(), a.end(), [](auto &a1, auto &a2){
-        if(a1[1] != a2[1]) return a1[1]<a2[1];
-        return a1[0]>a2[0];
+    sort(a.begin(), a.end(), [](auto &x, auto &y){
+        if(x[1] != y[1]) return x[1] < y[1];
+        return x[0] > y[0];
     });
 
     // How many ranges does a range contain
     BIT bit1(sz);
     vector<int> contains(n, 0);
-    for(int i = 0; i<n; i++){
+    for(int i = 0; i < n; i++){
         auto [s, e, id] = a[i];
         contains[id] = bit1.query(s, e);
         bit1.add(s, 1);
@@ -76,17 +76,17 @@ int main(){
     // How many ranges is a range contained in
     BIT bit2(sz);
     vector<int> contained(n, 0);
-    for(int i = n-1; i>=0; i--){
+    for(int i = n - 1; i >= 0; i--){
         auto [s, e, id] = a[i];
         contained[id] = bit2.query(0, s);
         bit2.add(s, 1);
     }
 
-    for(int i:contains) cout<<i<<' ';
+    for(int i : contains) cout<<i<<' ';
     cout<<'\n';
 
-    for(int i:contained) cout<<i<<' ';
+    for(int i : contained) cout<<i<<' ';
     cout<<'\n';
-    
+
     return 0;
 }

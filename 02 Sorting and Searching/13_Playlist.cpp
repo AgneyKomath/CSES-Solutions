@@ -9,20 +9,22 @@ int main(){
     cin>>n;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
-    
-    int res = 0;
-    map<int, int> mp;
+    for(int &i : a) cin>>i;
 
-    for(int i = 0, j = 0; j<n; j++){
-        mp[a[j]]++;
-        while(mp[a[j]] > 1){
-            mp[a[i]]--;
-            i++;
-        }
+    vector<int> b(a);
+    sort(b.begin(), b.end());
+    for(int &i : a) i = lower_bound(b.begin(), b.end(), i) - b.begin();
+
+    vector<int> last(n, -1);
+
+    int res = 1;
+    for(int i = 0, j = 0; j < n; j++){
+        i = max(i, last[a[j]] + 1);
+        last[a[j]] = j;
         res = max(res, j - i + 1);
     }
+
     cout<<res;
-    
+
     return 0;
 }

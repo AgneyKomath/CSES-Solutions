@@ -1,16 +1,16 @@
+// PQ Approach
 #include <bits/stdc++.h>
 using namespace std;
 
-// Set Approach
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
     int n;
     cin>>n;
-    
+
     vector<array<int, 3>> a(n);
-    for(int i = 0; i<n; i++){
+    for(int i = 0; i < n; i++){
         int s, e;
         cin>>s>>e;
         a[i] = {s, e, i};
@@ -18,31 +18,32 @@ int main(){
 
     sort(a.begin(), a.end());
 
-    int roomCount = 0;
-    set<pair<int, int>> st;
-
+    int cnt = 0;
     vector<int> res(n);
-    for(auto [s, e, i]:a){
-        if(st.empty() || st.begin()->first>=s){
-            roomCount++;
-            st.emplace(e, roomCount);
-            res[i] = roomCount;
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    for(auto [s, e, i] : a){
+        if(pq.empty() || pq.top().first >= s){
+            res[i] = ++cnt;
+            pq.emplace(e, cnt);
         }
         else{
-            auto roomNo = st.begin()->second;
-            st.erase(st.begin());
-            st.emplace(e, roomNo);
-            res[i] = roomNo;
+            auto id = pq.top().second;
+            pq.pop();
+            res[i] = id;
+            pq.emplace(e, id);
         }
     }
 
-    cout<<roomCount<<'\n';
-    for(int i:res) cout<<i<<' ';
+    cout<<cnt<<'\n';
+    for(int i : res) cout<<i<<' ';
 
     return 0;
 }
 
-// // Vector Approach, Better Runtime
+// // Vector Approach
+// #include <bits/stdc++.h>
+// using namespace std;
+
 // int main(){
 //     ios::sync_with_stdio(false);
 //     cin.tie(NULL);

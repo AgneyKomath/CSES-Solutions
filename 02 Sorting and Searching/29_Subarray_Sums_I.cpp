@@ -9,16 +9,16 @@ int main(){
     cin>>n>>x;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
     int res = 0;
-    for(int i = 0, j = 0, sum = 0; j<n; j++){
-        sum += a[j];
-        while(sum>x) sum -= a[i++];
-        res += (sum==x);
+    for(int i = 0, j = 0, curr = 0; j < n; j++){
+        curr += a[j];
+        while(curr > x) curr -= a[i++];
+        res += (curr == x); 
     }
 
     cout<<res;
-    
+
     return 0;
 }

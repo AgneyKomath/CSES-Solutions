@@ -8,15 +8,16 @@ int main(){
     int n;
     cin>>n;
 
-    long long sum = 0, mx = 0;
-    for(int i = 0; i<n; i++){
-        long long v;
+    int mx = 0;
+    long long sum = 0;
+    for(int i = 0; i < n; i++){
+        int v;
         cin>>v;
         sum += v;
         mx = max(mx, v);
     }
 
-    cout<<max(sum, 2*mx);
+    cout<<max(2ll * mx, sum);
 
     return 0;
 }

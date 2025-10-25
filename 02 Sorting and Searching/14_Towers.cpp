@@ -8,28 +8,16 @@ int main(){
     int n;
     cin>>n;
 
-    vector<int> k(n);
-    for(int &i:k) cin>>i;
+    vector<int> a(n);
+    for(int &i : a) cin>>i;
 
-    multiset<int> st;
-    for(int v:k){
-        auto it = st.upper_bound(v);
-        if(it != st.end()) st.erase(it);
-        st.insert(v);
+    vector<int> st;
+    for(int i : a){
+        if(st.empty() || st.back() <= i) st.push_back(i);
+        else *upper_bound(st.begin(), st.end(), i) = i;
     }
 
     cout<<st.size();
 
-    // // Vector instead of multiset
-    // vector<int> st;
-    // for(int i=0;i<n;i++){
-    //     int val;cin>>val;
-
-    //     auto it = upper_bound(st.begin(),st.end(),val);
-    //     if(it==st.end()) st.push_back(val);
-    //     else *it = val;
-    // }
-    // cout<<st.size();
-    
     return 0;
 }

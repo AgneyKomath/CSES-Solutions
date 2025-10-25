@@ -9,37 +9,23 @@ int main(){
     cin>>n>>k;
 
     vector<pair<int, int>> a(n);
-    for(auto &[e, s]:a){
-        cin>>s>>e;
-    }
+    for(auto &[e, s] : a) cin>>s>>e;
 
     sort(a.begin(), a.end());
 
-    int res = 0;
-
     multiset<int> st;
-    for(auto [e, s]:a){
-        if(st.empty()){
-            st.insert(e);
-            res++;
-            continue;
-        }
+    for(int i = 0; i < k; i++) st.insert(i);
+
+    int res = 0;
+    for(auto [e, s] : a){
         auto it = st.upper_bound(s);
-        if(it!=st.begin()){
-            it--;
-            st.erase(it);
-            st.insert(e);
-            res++;
-        }
-        else{
-            if(st.size()<k){
-                st.insert(e);
-                res++;
-            }
-        }
+        if(it == st.begin()) continue;
+        res++;
+        st.erase(--it);
+        st.insert(e);
     }
 
     cout<<res;
-    
+
     return 0;
 }

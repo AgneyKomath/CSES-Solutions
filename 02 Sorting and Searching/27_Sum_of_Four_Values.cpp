@@ -9,23 +9,23 @@ int main(){
     cin>>n>>x;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
     unordered_map<int, pair<int, int>> mp;
 
-    for(int i = 1; i<n; i++){
-        for(int j = i+1; j<n; j++){
+    for(int i = 1; i < n - 1; i++){
+        for(int j = i + 1; j < n; j++){
             int target = x - a[i] - a[j];
             if(mp.count(target)){
-                cout<<i+1<<' '<<j+1<<' '<<mp[target].first+1<<' '<<mp[target].second+1<<'\n';
+                cout<<i + 1<<' '<<j + 1<<' '<<mp[target].first<<' '<<mp[target].second;
                 return 0;
             }
         }
-        for(int j = 0; j<i; j++) mp[a[i] + a[j]] = {i, j};
+        for(int j = 0; j < i; j++) mp[a[i] + a[j]] = {i + 1, j + 1};
     }
 
     cout<<"IMPOSSIBLE";
-    
+
     return 0;
 }
 

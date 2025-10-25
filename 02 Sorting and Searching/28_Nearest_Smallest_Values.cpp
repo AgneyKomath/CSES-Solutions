@@ -9,15 +9,14 @@ int main(){
     cin>>n;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
-    stack<int> stack;
-    for(int i = 0; i<n; i++){
-        while(!stack.empty() && a[stack.top()]>=a[i]) stack.pop();
-        if(stack.empty()) cout<<0<<' ';
-        else cout<<stack.top() + 1<<' ';
-        stack.push(i);
+    stack<int> st;
+    for(int i = 0; i < n; i++){
+        while(!st.empty() && a[st.top()] >= a[i]) st.pop();
+        cout<<(st.empty() ? 0 : st.top() + 1)<<' ';
+        st.push(i);
     }
-    
+
     return 0;
 }
