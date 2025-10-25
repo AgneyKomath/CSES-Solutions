@@ -27,7 +27,7 @@ int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int a, b;
+    long long a, b;
     cin>>a>>b;
 
     s1 = to_string(a), s2 = to_string(b);
@@ -35,8 +35,8 @@ int main(){
     s1 = string(n - s1.size(), '0') + s1;
 
     memset(dp, -1, sizeof(dp));
-    
+
     cout<<f(0, 0, 1, 1, 1);
-    
+
     return 0;
 }
