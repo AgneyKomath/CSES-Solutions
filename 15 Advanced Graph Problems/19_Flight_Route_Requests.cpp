@@ -2,13 +2,12 @@
 using namespace std;
 
 struct DSU{
-    vector<int> f, siz, cost;
+    vector<int> f, siz;
 
     DSU(int n){
         f.resize(n);
         siz.assign(n, 1);
         iota(f.begin(),f.end(), 0);
-        cost.assign(n, 0);
     }
 
     int find(int x){
@@ -25,7 +24,6 @@ struct DSU{
         if(siz[y] > siz[x]) swap(x,y);
         f[y] = x;
         siz[x] += siz[y];
-        cost[x] += cost[y];
         return true;
     }
 };
