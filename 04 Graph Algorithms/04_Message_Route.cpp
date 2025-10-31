@@ -9,45 +9,44 @@ int main(){
     cin>>n>>m;
 
     vector<vector<int>> adj(n);
-    for(int i = 0; i<m; i++){
-        int a, b;
-        cin>>a>>b;
-        a--;
-        b--;
-        adj[a].push_back(b);
-        adj[b].push_back(a);
+    for(int i = 0; i < m; i++){
+        int u, v;
+        cin>>u>>v;
+        u--, v--;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
     }
 
-    vector<bool> vis(n, 0);
-    vector<int> par(n, -1);
+    vector<int> prev(n, -1), vis(n, 0);
     queue<int> q;
     q.push(0);
     vis[0] = 1;
+
     while(!q.empty()){
-        auto u = q.front();
+        int u = q.front();
         q.pop();
-        for(int v:adj[u]){
+        for(int v : adj[u]){
             if(vis[v]) continue;
-            par[v] = u;
-            vis[v] = 1;
-            q.push(v);
-            if(v==n-1){
-                vector<int> res;
-                int curr = v;
-                while(curr != -1){
-                    res.push_back(curr);
-                    curr = par[curr];
+            prev[v] = u;
+
+            if(v == n - 1){
+                vector<int> path;
+                while(v != -1){
+                    path.push_back(v);
+                    v = prev[v];
                 }
-                cout<<res.size()<<'\n';
-                for(int i = res.size() - 1; i>=0; i--){
-                    cout<<res[i]+1<<' ';
-                }
+                reverse(path.begin(), path.end());
+                cout<<path.size()<<'\n';
+                for(int i : path) cout<<i + 1<<' ';
                 return 0;
             }
+
+            vis[v] = 1;
+            q.emplace(v);
         }
     }
 
     cout<<"IMPOSSIBLE";
-    
+
     return 0;
 }

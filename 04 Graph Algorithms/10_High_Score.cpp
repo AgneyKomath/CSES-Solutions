@@ -1,19 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<bool> check(int u, vector<vector<int>> &adj){
-    int n = adj.size();
-    vector<bool> vis(n, 0);
-    auto dfs = [&](int node, auto &&dfs){
-        if(vis[node]) return;
-        vis[node] = 1;
-        for(auto v:adj[node]) dfs(v, dfs);
-    };
-    dfs(u, dfs);
-    return vis;
-}
-
-const long long INF = 1e18;
+using ll = long long;
+const ll INF = 1e18;
 
 int main(){
     ios::sync_with_stdio(false);
@@ -22,39 +11,46 @@ int main(){
     int n, m;
     cin>>n>>m;
 
+    vector<vector<pair<int, int>>> adj(n), radj(n);
     vector<array<int, 3>> edges(m);
-
-    vector<vector<int>> adj(n), revadj(n);
-    for(int i = 0; i<m; i++){
+    for(int i = 0; i < m; i++){
         int u, v, w;
         cin>>u>>v>>w;
-        u--;v--;
-        adj[u].push_back(v);
-        revadj[v].push_back(u);
-        edges[i] = {u, v, -w};
+        u--, v--;
+        adj[u].emplace_back(v, w);
+        radj[v].emplace_back(u, w);
+        edges[i] = {u, v, w};
     }
 
-    auto vis = check(0, adj), vis2 = check(n-1, revadj);
+    auto dfs = [](int u, vector<int> &r, vector<vector<pair<int, int>>> &a, auto &&dfs)->void{
+        r[u] = 1;
+        for(auto [v, w] : a[u]){
+            if(r[v]) continue;
+            dfs(v, r, a, dfs);
+        }
+    };
 
-    for(int i = 0; i<n; i++) vis[i] = vis[i] & vis2[i];
-    
-    vector<long long> dist(n, INF);
+    vector<int> r1(n, 0), r2(n, 0);
+    dfs(0, r1, adj, dfs);
+    dfs(n - 1, r2, radj, dfs);
+
+    vector<ll> dist(n, -INF);
     dist[0] = 0;
 
-    for(int i = 0; i<n; i++){
-        for(auto [u, v, w]:edges){
-            if(!vis[v] || !vis[u]) continue;
-            if(dist[u] != INF && dist[u] + w < dist[v]){
-                if(i==n-1){
-                    cout<<"-1";
-                    return 0;
-                }
+    bool change = false;
+    for(int i = 0; i < n; i++){
+        change = false;
+        for(auto [u, v, w] : edges){
+            if(!r1[u] || !r2[u] || !r1[v] || !r2[v]) continue;
+            if(dist[v] < dist[u] + w){
                 dist[v] = dist[u] + w;
+                change = true;
             }
         }
+        if(!change) break;
     }
 
-    cout<<-dist[n-1];
-    
+    cout<<(change ? -1 : dist[n - 1]);
+
     return 0;
 }

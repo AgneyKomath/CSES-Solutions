@@ -11,22 +11,30 @@ int main(){
     cin>>n>>m;
 
     vector<string> a(n);
-    for(auto &i:a) cin>>i;
+    for(auto &i : a) cin>>i;
 
-    auto dfs = [&](int r, int c, auto &&dfs){
-        if(r<0 || r>=n || c<0 || c>=m || a[r][c]=='#') return;
+    auto floodFill = [&](int r, int c){
+        queue<pair<int, int>> q;
+        q.emplace(r, c);
         a[r][c] = '#';
-        for(int i = 0; i<4; i++){
-            dfs(r + dir[i], c + dir[i+1], dfs);
+        while(!q.empty()){
+            auto [r, c] = q.front();
+            q.pop();
+            for(int i = 0; i < 4; i++){
+                int nr = r + dir[i], nc = c + dir[i + 1];
+                if(nr < 0 || nr >= n || nc < 0 || nc >= m || a[nr][nc] == '#') continue;
+                a[nr][nc] = '#';
+                q.emplace(nr, nc);
+            }
         }
     };
 
     int res = 0;
-    for(int i = 0; i<n; i++){
-        for(int j = 0; j<m; j++){
-            if(a[i][j]=='.'){
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(a[i][j] == '.'){
                 res++;
-                dfs(i, j, dfs);
+                floodFill(i, j);
             }
         }
     }

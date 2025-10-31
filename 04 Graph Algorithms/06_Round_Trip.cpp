@@ -7,56 +7,48 @@ int main(){
 
     int n, m;
     cin>>n>>m;
-    
+
     vector<vector<int>> adj(n);
-    for(int i = 0; i<m; i++){
+    for(int i = 0; i < m; i++){
         int u, v;
         cin>>u>>v;
-        u--;v--;
+        u--, v--;
         adj[u].push_back(v);
         adj[v].push_back(u);
     }
 
-    vector<bool> vis(n, 0);
-    vector<int> prev(n, -1);
-    vector<int> cycle;
+    vector<int> prev(n, -1), vis(n, 0);
 
     auto dfs = [&](int u, auto &&dfs)->void{
         vis[u] = 1;
-        for(int v:adj[u]){
-            if(!cycle.empty()) break;
+        for(int v : adj[u]){
             if(v == prev[u]) continue;
-            
-            if(!vis[v]){
-                prev[v] = u;
-                dfs(v, dfs);
-            }
-            else{
-                int curr = u;
+
+            if(vis[v]){
+                vector<int> cycle;
                 cycle.push_back(v);
+                int curr = u;
                 while(curr != v){
                     cycle.push_back(curr);
                     curr = prev[curr];
                 }
                 cycle.push_back(v);
-            } 
+                cout<<cycle.size()<<'\n';
+                for(int i : cycle) cout<<i + 1<<' ';
+                exit(0);
+            }
+
+            prev[v] = u;
+            dfs(v, dfs);
         }
     };
 
-    for(int i = 0; i<n; i++){
-        if(!cycle.empty()) break;
-        if(!vis[i]){
-            dfs(i, dfs);
-        }
+    for(int i = 0; i < n; i++){
+        if(vis[i]) continue;
+        dfs(i, dfs);
     }
 
-    if(cycle.empty()){ 
-        cout<<"IMPOSSIBLE";
-    }
-    else{
-        cout<<cycle.size()<<'\n';
-        for(int i:cycle) cout<<i+1<<' ';
-    }
-    
+    cout<<"IMPOSSIBLE";
+
     return 0;
 }

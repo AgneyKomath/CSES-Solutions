@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const long long INF = 1e18;
+using ll = long long;
 
 int main(){
     ios::sync_with_stdio(false);
@@ -9,19 +9,19 @@ int main(){
 
     int n, m;
     cin>>n>>m;
-    
+
     vector<array<int, 3>> edges(m);
-    for(int i = 0; i<m; i++){
+    for(int i = 0; i < m; i++){
         int u, v, w;
         cin>>u>>v>>w;
         u--, v--;
         edges[i] = {u, v, w};
     }
 
-    vector<long long> dist(n, 0);
+    vector<ll> dist(n, 0);
     vector<int> prev(n, -1);
     int lastnode;
-    for(int i = 0; i<n; i++){
+    for(int i = 0; i < n; i++){
         lastnode = -1;
         for(auto [u, v, w]:edges){
             if(dist[u] + w < dist[v]){
@@ -31,7 +31,7 @@ int main(){
             }
         }
     }
-    
+
     if(lastnode == -1){
         cout<<"NO";
         return 0;

@@ -2,12 +2,7 @@
 using namespace std;
 
 int dir[] = {1, 0, -1, 0, 1};
-map<pair<int, int>, char> mp{
-    {{-1, 0}, 'U'},
-    {{1, 0}, 'D'},
-    {{0, -1}, 'L'},
-    {{0, 1}, 'R'}
-};
+string dirs = "DLUR";
 
 int main(){
     ios::sync_with_stdio(false);
@@ -17,54 +12,50 @@ int main(){
     cin>>n>>m;
 
     vector<string> a(n);
-    for(auto &i:a) cin>>i;
+    for(auto &i : a) cin>>i;
 
-    queue<pair<int, int>> q;
-    vector<vector<pair<int, int>>> prev(n, vector<pair<int, int>>(m, {-1, -1}));
-
-    for(int i = 0; i<n; i++){
-        for(int j = 0; j<m; j++){
-            if(a[i][j]=='A'){
-                q.emplace(i, j);
-                a[i][j] = '#';
+    int sr = -1, sc = -1;
+    for(int i = 0; i < n && sr == -1; i++){
+        for(int j = 0; j < n && sr == -1; j++){
+            if(a[i][j] == 'A'){
+                sr = i, sc = j;
             }
         }
     }
 
-    string path;
+    queue<pair<int, int>> q;
+    vector<vector<int>> prev(n, vector<int>(m, -1));
+    q.emplace(sr, sc);
+    a[sr][sc] = '#';
 
-    while(!q.empty() && path.empty()){
+    while(!q.empty()){
         auto [r, c] = q.front();
         q.pop();
-        for(int i = 0; i<4; i++){
-            int nr = r + dir[i], nc = c + dir[i+1];
-            if(nr<0 || nr>=n || nc<0 || nc>=m || a[nr][nc]=='#') continue;
-            prev[nr][nc] = {r, c};
-            if(a[nr][nc]=='B'){
-                int cr = nr, cc = nc;
-                while(prev[cr][cc].first != -1){
-                    auto [pr, pc] = prev[cr][cc];
-                    int dr = cr - pr, dc = cc - pc;
-                    path += mp[{dr, dc}];
-                    cr = pr;
-                    cc = pc;
+        for(int i = 0; i < 4; i++){
+            int nr = r + dir[i], nc = c + dir[i + 1];
+            if(nr < 0 || nr >= n || nc < 0 || nc >= m || a[nr][nc] == '#') continue;
+            prev[nr][nc] = i;
+
+            if(a[nr][nc] == 'B'){
+                string path;
+                while(prev[nr][nc] != -1){
+                    int d = prev[nr][nc];
+                    path.push_back(dirs[d]);
+                    nr -= dir[d], nc -= dir[d + 1];
                 }
-                break;
+                reverse(path.begin(), path.end());
+                cout<<"YES\n";
+                cout<<path.size()<<'\n';
+                cout<<path;
+                return 0;
             }
+
             a[nr][nc] = '#';
             q.emplace(nr, nc);
         }
     }
 
-    if(path.empty()){
-        cout<<"NO";
-    }
-    else{
-        cout<<"YES\n";
-        reverse(path.begin(), path.end());
-        cout<<path.size()<<'\n';
-        cout<<path;
-    }
+    cout<<"NO";
 
     return 0;
 }

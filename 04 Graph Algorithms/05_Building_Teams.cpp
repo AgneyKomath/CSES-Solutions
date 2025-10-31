@@ -9,43 +9,31 @@ int main(){
     cin>>n>>m;
 
     vector<vector<int>> adj(n);
-    for(int i = 0; i<m; i++){
-        int a, b;
-        cin>>a>>b;
-        a--;
-        b--;
-        adj[a].push_back(b);
-        adj[b].push_back(a);
+    for(int i = 0; i < m; i++){
+        int u, v;
+        cin>>u>>v;
+        u--, v--;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
     }
 
-    bool flag = true;
-    vector<int> team(n, 0);
-    auto dfs = [&](int u, int curr, auto &&dfs)->void{
-        curr = 3 - curr;
-        for(int v:adj[u]){
-            if(team[v]){
-                if(team[v] != curr) flag = false;
-            }
-            else{
-                team[v] = curr;
-                dfs(v, curr, dfs);
+    vector<int> col(n, 0);
+    auto dfs = [&](int u, int c, auto &&dfs)->void{
+        col[u] = c;
+        for(int v : adj[u]){
+            if(col[v] == 0) dfs(v, 3 - c, dfs);
+            else if(col[v] == col[u]){
+                cout<<"IMPOSSIBLE";
+                exit(0);
             }
         }
     };
 
-    for(int i = 0; i<n; i++){
-        if(!team[i]){
-            team[i] = 1;
-            dfs(i, 1, dfs);
-        }
+    for(int i = 0; i < n; i++){
+        if(!col[i]) dfs(i, 1, dfs);
     }
 
-    if(!flag){
-        cout<<"IMPOSSIBLE";
-    }
-    else{
-        for(int i:team) cout<<i<<" ";
-    }
-    
+    for(int i : col) cout<<i<<' ';
+
     return 0;
 }

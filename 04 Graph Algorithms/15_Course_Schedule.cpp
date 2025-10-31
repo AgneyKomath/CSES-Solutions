@@ -7,38 +7,36 @@ int main(){
 
     int n, m;
     cin>>n>>m;
-    
-    vector<int> indegree(n, 0);
+
     vector<vector<int>> adj(n);
-    for(int i = 0; i<m; i++){
+    vector<int> indeg(n, 0);
+    for(int i = 0; i < m; i++){
         int u, v;
         cin>>u>>v;
-        u--;v--;
+        u--, v--;
         adj[u].push_back(v);
-        indegree[v]++;
+        indeg[v]++;
     }
 
     queue<int> q;
-    for(int i = 0; i<n; i++){
-        if(indegree[i]==0) q.push(i);
+    for(int i = 0; i < n; i++){
+        if(indeg[i] == 0) q.push(i);
     }
 
-    vector<int> order;
+    vector<int> topo;
     while(!q.empty()){
         int u = q.front();
         q.pop();
-        order.push_back(u);
-        for(int v:adj[u]){
-            if(--indegree[v]==0) q.push(v);
+        topo.push_back(u);
+        for(int v : adj[u]){
+            if(--indeg[v] == 0){
+                q.push(v);
+            }
         }
     }
-    
-    if(order.size()!=n){
-        cout<<"IMPOSSIBLE";
-    }
-    else{
-        for(int i:order) cout<<i+1<<' ';
-    }
-    
+
+    if(topo.size() != n) cout<<"IMPOSSIBLE";
+    else for(int i : topo) cout<<i + 1<<' ';
+
     return 0;
 }
