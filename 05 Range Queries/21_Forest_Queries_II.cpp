@@ -1,35 +1,60 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct BIT{
-    int n;
-    vector<vector<int>> tree;
+template <typename T>
+struct BIT2D{
+    int n, m;
+    vector<vector<T>> tree, a;
 
-    BIT(int _n){
+    BIT2D(int _n, int _m){
         n = _n;
-        tree.assign(n+1, vector<int>(n+1, 0));
+        m = _m;
+        a.assign(n, vector<T>(m, 0));
+        tree.assign(n + 1, vector<T>(m + 1, 0));
     }
 
-    void add(int r, int c, int v){
-        for(int i = r+1; i<=n; i+=i&-i){
-            for(int j = c+1; j<=n; j+=j&-j){
+    BIT2D(vector<vector<T>> arr){
+        n = arr.size(), m = arr[0].size();
+        tree.assign(n + 1, vector<T>(m + 1, 0));
+        a.assign(n, vector<T>(m, 0));
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                add(i, j, a[i][j]);
+            }
+        }
+    }
+
+    void add(int r, int c, T v){
+        a[r][c] += v;
+        for(int i = r + 1; i <= n; i += i&-i){
+            for(int j = c + 1; j <= m; j += j&-j){
                 tree[i][j] += v;
             }
         }
     }
 
-    int query(int r, int c){
-        int sum = 0;
-        for(int i = r+1; i; i-=i&-i){
-            for(int j = c+1; j; j-=j&-j){
+    void set(int r, int c, T v){
+        T diff = v - a[r][c];
+        add(r, c, diff);
+    }
+
+    void toggle(int r, int c){
+        if(a[r][c] == 0) add(r, c, 1);
+        else add(r, c, -1);
+    }
+
+    T query(int r, int c){
+        T sum = 0;
+        for(int i = r + 1; i > 0; i -= i&-i){
+            for(int j = c + 1; j > 0; j -= j&-j){
                 sum += tree[i][j];
             }
         }
         return sum;
     }
 
-    int query(int r1, int c1, int r2, int c2){
-        return query(r2, c2) - query(r1-1, c2) - query(r2, c1-1) + query(r1-1, c1-1);
+    T query(int r1, int c1, int r2, int c2){
+        return query(r2, c2) - query(r1 - 1, c2) - query(r2, c1 - 1) + query(r1 - 1, c1 - 1);
     }
 };
 
@@ -41,40 +66,31 @@ int main(){
     cin>>n>>q;
 
     vector<string> a(n);
-    for(auto &i:a) cin>>i;
+    for(auto &i : a) cin>>i;
 
-    BIT bit(n);
-    for(int i = 0; i<n; i++){
-        for(int j = 0; j<n; j++){
-            if(a[i][j]=='*'){
-                bit.add(i, j, 1);
-            }
+    BIT2D<int> bit(n, n);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            if(a[i][j] == '*') bit.toggle(i, j);
         }
     }
 
     while(q--){
         int t;
         cin>>t;
-        if(t==1){
+        if(t == 1){
             int r, c;
             cin>>r>>c;
-            r--;c--;
-            if(a[r][c]=='*'){
-                a[r][c] = '.';
-                bit.add(r, c, -1);
-            }
-            else{
-                a[r][c] = '*';
-                bit.add(r, c, 1);
-            }
+            r--, c--;
+            bit.toggle(r, c);
         }
-        else if(t==2){
+        else{
             int r1, c1, r2, c2;
             cin>>r1>>c1>>r2>>c2;
-            r1--;c1--;r2--;c2--;
+            r1--, c1--, r2--, c2--;
             cout<<bit.query(r1, c1, r2, c2)<<'\n';
         }
     }
-    
+
     return 0;
 }

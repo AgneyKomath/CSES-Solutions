@@ -1,53 +1,61 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+template <typename T>
 struct BIT{
     //Fenwick Tree by Fusion15
-    vector<int> arr;
-    vector<long long> tree;
+    vector<T> arr;
+    vector<T> tree;
     int n;
-    
-    void build(vector<int> &a){
-        for(int i = 0; i<n; i++){
-            add(i, a[i]);
-        }
+
+    BIT(){
+        n = 0;
     }
-    
+
     BIT(int _n){
         n = _n;
-        tree.resize(n+1, 0);
+        tree.resize(n + 1, 0);
         arr.resize(n, 0);
     }
-    
-    BIT(vector<int> &a){
+
+    template<typename U>
+    BIT(vector<U> &a){
         n = a.size();
         arr.resize(n, 0);
-        tree.resize(n+1, 0);
-        build(a);
+        tree.resize(n + 1, 0);
+        // O(n) build
+        for(int i = 0; i < n; i++){
+            arr[i] += a[i];
+            int id = i + 1;
+            tree[id] += arr[i];
+            int j = id + (id&-id);
+            if(j <= n) tree[j] += tree[id];
+        }
     }
-    
-    void add(int ind, int val){
-        arr[ind] += val;
-        for(int i=ind+1; i<=n; i += i&-i){
+
+    void add(int id, T val){
+        arr[id] += val;
+        for(int i = id + 1; i <= n; i += i&-i){
             tree[i] += val;
         }
     }
-    
-    void update(int ind, int val){
-        int diff = val - arr[ind];
-        add(ind, diff);
+
+    void update(int id, T val){
+        T diff = val - arr[id];
+        add(id, diff);
     }
-    
-    long long query(int ind){
-        long long sum = 0;
-        for(int i = ind+1; i>0; i -= i&-i){
+
+    T query(int id){
+        T sum = 0;
+        for(int i = id + 1; i > 0; i -= i&-i){
             sum += tree[i];
         }
         return sum;
     }
 
-    long long query(int l, int r){
-        return query(r) - query(l-1);
+    T query(int l, int r){
+        if(l > r) return 0;
+        return query(r) - query(l - 1);
     }
 };
 
@@ -59,27 +67,26 @@ int main(){
     cin>>n>>q;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
-    BIT bit(a);
+    BIT<long long> bit(a);
 
     while(q--){
-        int type;
-        cin>>type;
-        if(type==1){
+        int t;
+        cin>>t;
+        if(t == 1){
             int id, val;
             cin>>id>>val;
             id--;
             bit.update(id, val);
         }
-        else if(type==2){
+        else{
             int l, r;
             cin>>l>>r;
-            l--;
-            r--;
+            l--, r--;
             cout<<bit.query(l, r)<<'\n';
         }
     }
-    
+
     return 0;
 }

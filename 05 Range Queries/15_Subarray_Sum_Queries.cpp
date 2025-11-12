@@ -1,104 +1,91 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+template <class T, T (*merge)(T, T), T (*neutral)()>
+struct SegTree{
+    //Segment Tree by Fusion15
+    vector<T> tree;
+    int n;
+
+    SegTree(){
+        n = 0;
+    }
+
+    SegTree(int _n){
+        n = _n;
+        tree.resize(4 * n, neutral());
+    }
+
+    SegTree(vector<T> &a){
+        n = a.size();
+        tree.resize(4 * n);
+        build(1, 0, n - 1, a);
+    }
+
+    void build(int node, int start, int end, vector<T> &a){
+        if(start == end) tree[node] = a[start];
+        else{
+            int mid = (start + end) / 2;
+            build(2 * node, start, mid, a);
+            build(2 * node + 1, mid + 1, end, a);
+            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
+        }
+    }
+
+    void update(int node, int start, int end, int id, T val){
+        if(start == end) tree[node] = val;
+        else{
+            int mid = (start + end) / 2;
+            if(id <= mid) update(2 * node, start, mid, id, val);
+            else update(2 * node + 1, mid + 1, end, id, val);
+            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
+        }
+    }
+
+    T query(int node, int start, int end, int L, int R){
+        if (R < start || L > end) return neutral();
+        if (L <= start && end <= R) return tree[node];
+        int mid = (start + end) / 2;
+        T l = query(2 * node, start, mid, L, R);
+        T r = query(2 * node + 1, mid + 1, end, L, R);
+        return merge(l, r);
+    }
+
+    T query(int l, int r){
+        return query(1, 0, n - 1, l, r);
+    }
+
+    void update(int id, T val){
+        update(1, 0, n - 1, id, val);
+    }
+};
+
 struct Node{
     long long pref = 0;
     long long suff = 0;
-    long long mxSub = 0;
-    long long fullSub = 0;
+    long long full = 0;
+    long long mxsub = 0;
     Node(){}
     Node(int val){
         pref = max(0, val);
         suff = max(0, val);
-        mxSub = max(0, val);
-        fullSub = val;
-    }
-    Node(long long pf, long long sf, long long mxsb, long long flsb){
-        pref = max(0ll, pf);
-        suff = max(0ll, sf);
-        mxSub = max(0ll, mxsb);
-        fullSub = flsb;
+        full = val;
+        mxsub = max(0, val);
     }
 };
 
-template <typename T>
-class SegTree {
-    //Segment tree by Fusion15
-    vector<T> tree;
-    vector<int> arr;
-    int n;
+Node merge(Node a, Node b){
+    Node res;
+    res.pref = max(a.pref, a.full + b.pref);
+    res.suff = max(b.suff, a.suff + b.full);
+    res.full = a.full + b.full;
+    res.mxsub = max({a.mxsub, b.mxsub, a.suff + b.pref});
+    return res;
+}
 
-    //Change
-    T neutral = Node();
-    T merge(T a, T b) {
-        long long pref = max(a.pref, a.fullSub + b.pref);
-        long long suff = max(b.suff, b.fullSub + a.suff);
-        long long mxSub = max({a.mxSub, b.mxSub, a.suff + b.pref});
-        long long fullSub = a.fullSub + b.fullSub;
-        return Node(pref, suff, mxSub, fullSub); 
-    }
-
-    void build(int node, int start, int end) {
-        if(start == end){
-            //Change 
-            tree[node] = Node(arr[start]);
-        }
-        else{
-            int mid = (start + end) / 2;
-            build(2*node, start, mid);
-            build(2*node+1, mid + 1, end);
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
-        }
-    }
-
-    void update(int node, int start, int end, int idx, int value) {
-        if(start == end) {
-            //Change
-            arr[idx] = value;
-            tree[node] = Node(value);
-        }
-        else{
-            int mid = (start + end) / 2;
-            if(idx <= mid) {
-                update(2*node, start, mid, idx, value);
-            }
-            else{
-                update(2*node+1, mid + 1, end, idx, value);
-            }
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
-        }
-    }
-
-    T query(int node, int start, int end, int L, int R) {
-        if (R < start || L > end) return neutral;
-        if (L <= start && end <= R) return tree[node];
-        int mid = (start + end) / 2;
-        T l = query(2*node, start, mid, L, R);
-        T r = query(2*node+1, mid + 1, end, L, R);
-        return merge(l, r);
-    }
-
-public:
-    SegTree(int _n){
-        n = _n;
-        tree.resize(4*n, neutral);
-        arr.resize(n, neutral);
-    }
-    SegTree(const vector<int> &a) {
-        n = a.size();
-        tree.resize(4*n, neutral);
-        arr = a;
-        build(1, 0, n - 1);
-    }
-
-    T query(int l, int r) {
-        return query(1, 0, n - 1, l, r);
-    }
-
-    void update(int idx, int value) {
-        update(1, 0, n - 1, idx, value);
-    }
-};
+Node neutral(){
+    return Node();
+}
 
 int main(){
     ios::sync_with_stdio(false);
@@ -106,19 +93,23 @@ int main(){
 
     int n, q;
     cin>>n>>q;
-    
-    vector<int> a(n);
-    for(int &i:a) cin>>i;
 
-    SegTree<Node> st(a);
+    vector<Node> a(n);
+    for(int i = 0; i < n; i++){
+        int v;
+        cin>>v;
+        a[i] = Node(v);
+    }
+
+    SegTree<Node, merge, neutral> st(a);
 
     while(q--){
-        int k, x;
-        cin>>k>>x;
-        k--;
-        st.update(k, x);
-        cout<<st.query(0, n-1).mxSub<<'\n';
+        int id, v;
+        cin>>id>>v;
+        id--;
+        st.update(id, Node(v));
+        cout<<st.query(0, n - 1).mxsub<<'\n';
     }
-    
+
     return 0;
 }

@@ -9,20 +9,20 @@ int main(){
     cin>>n>>q;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
-    vector<long long> pref(n+1);
+    vector<long long> pref(n + 1);
     pref[0] = 0;
-    for(int i = 0; i<n; i++){
-        pref[i+1] = pref[i] + a[i];
+    for(int i = 0; i < n; i++){
+        pref[i + 1] = pref[i] + a[i];
     }
 
     while(q--){
         int l, r;
         cin>>l>>r;
-        long long res = pref[r] - pref[l-1];
-        cout<<res<<'\n';
+        l--, r--;
+        cout<<pref[r + 1] - pref[l]<<'\n';
     }
-    
+
     return 0;
 }

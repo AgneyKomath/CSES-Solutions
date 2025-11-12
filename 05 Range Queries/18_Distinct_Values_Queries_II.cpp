@@ -1,131 +1,58 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct SegTreeMax {
+struct SegTree {
     //Segment Tree by Fusion15
     vector<int> tree;
-    vector<int> arr;
-    int n;
-
-    //Change
-    int neutral = -1e9;
-    int merge(int a, int b) {
-        return max(a, b);
-    }
-
-    void build(int node, int start, int end) {
-        if(start == end) tree[node] = arr[start];
-        else{
-            int mid = (start + end) / 2;
-            build(2*node, start, mid);
-            build(2*node+1, mid + 1, end);
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
-        }
-    }
-
-    void update(int node, int start, int end, int idx, int value) {
-        if(start == end) {
-            arr[idx] = value;
-            tree[node] = value;
-        }
-        else{
-            int mid = (start + end) / 2;
-            if(idx <= mid) {
-                update(2*node, start, mid, idx, value);
-            }
-            else{
-                update(2*node+1, mid + 1, end, idx, value);
-            }
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
-        }
-    }
-
-    int query(int node, int start, int end, int L, int R) {
-        if (R < start || L > end) return neutral;
-        if (L <= start && end <= R) return tree[node];
-        int mid = (start + end) / 2;
-        int l = query(2*node, start, mid, L, R);
-        int r = query(2*node+1, mid + 1, end, L, R);
-        return merge(l, r);
-    }
-
-    SegTreeMax(const vector<int> &a) {
-        n = a.size();
-        tree.resize(4 * n);
-        arr = a;
-        build(1, 0, n - 1);
-    }
-
-    int query(int l, int r) {
-        return query(1, 0, n - 1, l, r);
-    }
-
-    void update(int idx, int value) {
-        update(1, 0, n - 1, idx, value);
-    }
-};
-
-struct SegTreeMin {
-    //Segment Tree by Fusion15
-    vector<int> tree;
-    vector<int> arr;
     int n;
 
     //Change
     int neutral = 1e9;
-    int merge(int a, int b) {
+    int merge(int a, int b){
         return min(a, b);
     }
 
-    void build(int node, int start, int end) {
-        if(start == end) tree[node] = arr[start];
+    SegTree(vector<int> & a){
+        n = a.size();
+        tree.resize(4 * n);
+        build(1, 0, n - 1, a);
+    }
+
+    void build(int node, int start, int end, vector<int> &a){
+        if(start == end) tree[node] = a[start];
         else{
             int mid = (start + end) / 2;
-            build(2*node, start, mid);
-            build(2*node+1, mid + 1, end);
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
+            build(2 * node, start, mid, a);
+            build(2 * node + 1, mid + 1, end, a);
+            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
         }
     }
 
-    void update(int node, int start, int end, int idx, int value) {
-        if(start == end) {
-            arr[idx] = value;
-            tree[node] = value;
-        }
+    void update(int node, int start, int end, int id, int val){
+        if(start == end) tree[node] = val;
         else{
             int mid = (start + end) / 2;
-            if(idx <= mid) {
-                update(2*node, start, mid, idx, value);
-            }
-            else{
-                update(2*node+1, mid + 1, end, idx, value);
-            }
-            tree[node] = merge(tree[2*node], tree[2*node+1]);
+            if(id <= mid) update(2 * node, start, mid, id, val);
+            else update(2 * node + 1, mid + 1, end, id, val);
+            tree[node] = merge(tree[2 * node], tree[2 * node + 1]);
         }
     }
 
-    int query(int node, int start, int end, int L, int R) {
+    int query(int node, int start, int end, int L, int R){
         if (R < start || L > end) return neutral;
         if (L <= start && end <= R) return tree[node];
         int mid = (start + end) / 2;
-        int l = query(2*node, start, mid, L, R);
-        int r = query(2*node+1, mid + 1, end, L, R);
+        int l = query(2 * node, start, mid, L, R);
+        int r = query(2 * node + 1, mid + 1, end, L, R);
         return merge(l, r);
     }
 
-    SegTreeMin(const vector<int> &a) {
-        n = a.size();
-        tree.resize(4 * n);
-        arr = a;
-        build(1, 0, n - 1);
+    void update(int id, int val){
+        update(1, 0, n - 1, id, val);
     }
 
-    int query(int l, int r) {
+    int query(int l, int r){
         return query(1, 0, n - 1, l, r);
-    }
-
-    void update(int idx, int value) {
-        update(1, 0, n - 1, idx, value);
     }
 };
 
@@ -137,81 +64,75 @@ int main(){
     cin>>n>>q;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
-    vector<array<int, 3>> queries(q);
-    for(auto &[x, y, z]:queries){
-        cin>>x>>y>>z;
-        y--;
-        if(x==2) z--;
+    vector<array<int, 3>> quers(q);
+    for(auto &[t, x, y] : quers){
+        cin>>t>>x>>y;
+        if(t == 1) x--;
+        else x--, y--;
     }
-    
-    // Coordinate Compression
+
     vector<int> b(a);
-    for(auto [x, y, z]:queries) if(x==1) b.push_back(z);
+    for(auto [t, x, y] : quers){
+        if(t == 1) b.push_back(y);
+    }
     sort(b.begin(), b.end());
     b.erase(unique(b.begin(), b.end()), b.end());
-    auto compress = [&](int v){return lower_bound(b.begin(), b.end(), v) - b.begin();};
+    auto compress = [&](int v){
+        return lower_bound(b.begin(), b.end(), v) - b.begin();
+    };
     int sz = b.size();
 
-    // set of current indices for each value to enable binary search
-    vector<set<int>> mp(sz);
-    for(int i = 0; i<sz; i++){
-        mp[i].insert(-1);
-        mp[i].insert(n);
-    }
-
-    for(int i = 0; i<n; i++){
+    vector<int> nxt(n, n);
+    vector<set<int>> pos(sz);
+    for(int i = 0; i < n; i++){
         a[i] = compress(a[i]);
-        mp[a[i]].insert(i);
+        if(!pos[a[i]].empty()) nxt[*pos[a[i]].rbegin()] = i;
+        pos[a[i]].insert(i);
+    }
+    for(int i = 0; i < sz; i++){
+        if(!pos[i].empty()) nxt[*pos[i].rbegin()] = n;
+        pos[i].insert(n);
     }
 
-    // first left and right indices containing same value
-    vector<int> left(n, -1), right(n, n);
-    for(int i = 0; i<n; i++){
-        auto itr = mp[a[i]].upper_bound(i);
-        right[i] = *(itr--);
-        left[i] = *(--itr);
-    }
-    
-    SegTreeMax stl(left);
-    SegTreeMin str(right);
+    SegTree st(nxt);
 
-    auto remove = [&](int pos, int val){
-        mp[val].erase(pos);
-        auto itr = mp[val].upper_bound(pos);
-        int right = *itr;
-        int left = *(--itr);
-        if(right != n) stl.update(right, left);
-        if(left != -1) str.update(left, right);
+    auto remove = [&](int id){
+        int v = a[id];
+        pos[v].erase(id);
+        auto next = pos[v].lower_bound(id);
+        if(next != pos[v].begin()){
+            auto prev = next;
+            prev--;
+            st.update(*prev, *next);
+        }
     };
 
-    auto add = [&](int pos, int val){
-        auto itr = mp[val].upper_bound(pos);
-        int right = *itr;
-        int left = *(--itr);
-        str.update(pos, right);
-        stl.update(pos, left);
-        if(right != n) stl.update(right, pos);
-        if(left != -1) str.update(left, pos);
-        mp[val].insert(pos);
+    auto add = [&](int id){
+        int v = a[id];
+        auto next = pos[v].lower_bound(id);
+        st.update(id, *next);
+        if(next != pos[v].begin()){
+            auto prev = next;
+            prev--;
+            st.update(*prev, id);
+        }
+        pos[v].insert(id);
     };
 
-    for(auto [t, y, z]:queries){
-        if(t==1){
-            z = compress(z);
-            remove(y, a[y]);
-            add(y, z);
-            a[y] = z; 
+    for(auto [t, x, y] : quers){
+        if(t == 1){
+            remove(x);
+            y = compress(y);
+            a[x] = y;
+            add(x);
         }
         else{
-            // if max left index and min right index lie outside [y, z] all values are distinct
-            int mx = stl.query(y, z);
-            int mn = str.query(y, z);
-            if(mx<y && mn>z) cout<<"YES\n";
-            else cout<<"NO\n";
+            int v = st.query(x, y);
+            cout<<(v <= y ? "NO" : "YES")<<'\n';
         }
     }
-    
+
     return 0;
 }
