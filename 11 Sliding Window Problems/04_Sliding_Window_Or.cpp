@@ -13,28 +13,27 @@ int main(){
 
     vector<int> arr(n);
     arr[0] = x;
-    for(int i = 1; i<n; i++){
-        arr[i] = (1ll * a * arr[i-1] + b) % c;
+    for(int i = 1; i < n; i++){
+        arr[i] = (1ll * a * arr[i - 1] + b) % c;
     }
 
     vector<int> pref(n), suff(n);
-    for(int i = 0; i<n; i++){
-        if(i%k==0) pref[i] = arr[i];
-        else pref[i] = arr[i] | pref[i-1];
+    for(int i = 0; i < n; i++){
+        if(i % k == 0) pref[i] = arr[i];
+        else pref[i] = pref[i - 1] | arr[i];
     }
 
-    for(int i = n/k * k - 1; i>=0; i--){
-        if(i%k==k-1) suff[i] = arr[i];
-        else suff[i] = arr[i] | suff[i+1];
+    for(int i = n - 1 - n % k; i >= 0; i--){
+        if(i % k == 0) suff[i] = arr[i];
+        else suff[i] = suff[i + 1] | arr[i];
     }
 
     int res = 0;
-    for(int i = 0; i+k-1<n; i++){
-        int l = i, r = i+k-1;
-        int v = pref[r] | suff[l];
-        res ^= v;
+    for(int i = k - 1; i < n; i++){
+        res ^= pref[i] | suff[i - k + 1];
     }
+
     cout<<res;
-    
+
     return 0;
 }

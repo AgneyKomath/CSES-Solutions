@@ -9,63 +9,63 @@ int main(){
     cin>>n>>k;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
+    long long sl = 0, su = 0;
     multiset<int> lower, upper;
-    long long sum1 = 0, sum2 = 0;
-
     auto balance = [&](){
-        if(lower.size()>upper.size()+1){
-            int val = *lower.rbegin();
-            upper.insert(val);
-            lower.erase(prev(lower.end()));
-            sum2 += val;
-            sum1 -= val;
+        if(lower.size() > upper.size() + 1){
+            int v = *lower.rbegin();
+            upper.insert(v);
+            lower.extract(v);
+            su += v;
+            sl -= v;
         }
-        else if(upper.size()>lower.size()){
-            int val = *upper.begin();
-            lower.insert(val);
-            upper.erase(upper.begin());
-            sum1 += val;
-            sum2 -= val;
+        else if(upper.size() > lower.size()){
+            int v = *upper.begin();
+            lower.insert(v);
+            upper.extract(v);
+            sl += v;
+            su -= v;
         }
     };
 
     auto add = [&](int v){
-        if(lower.empty()|| v<= *lower.rbegin()){
+        if(lower.empty() || *lower.rbegin() >= v){
             lower.insert(v);
-            sum1 += v;
-        } 
+            sl += v;
+        }
         else{
             upper.insert(v);
-            sum2 += v;
-        } 
-        balance();
-    };
-    
-    auto remove = [&](int v){
-        if(upper.find(v)!=upper.end()){
-            upper.erase(upper.find(v));
-            sum2 -= v;
-        }
-        else if(lower.find(v)!=lower.end()) {
-            lower.erase(lower.find(v));
-            sum1 -= v;
+            su += v;
         }
         balance();
     };
 
-    for(int i = 0, j = 0; j<n; j++){
-        add(a[j]);
-        if(j-i+1==k){
-            int med = *lower.rbegin();
-            int n1 = lower.size();
-            int n2 = upper.size();
-            long long res = 1ll * med * n1 - sum1 + sum2 - 1ll * med * n2;
-            cout<<res<<' ';
-            remove(a[i++]);
+    auto remove = [&](int v){
+        if(lower.count(v)){
+            lower.extract(v);
+            sl -= v;
+        }
+        else{
+            upper.extract(v);
+            su -= v;
+        }
+        balance();
+    };
+
+    auto get = [&](){
+        long long m = *lower.rbegin();
+        return m * lower.size() - sl + su - m * upper.size();
+    };
+
+    for(int i = 0; i < n; i++){
+        add(a[i]);
+        if(i >= k - 1){
+            cout<<get()<<' ';
+            remove(a[i - k + 1]);
         }
     }
-    
+
     return 0;
 }

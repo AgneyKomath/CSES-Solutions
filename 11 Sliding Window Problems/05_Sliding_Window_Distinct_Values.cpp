@@ -9,17 +9,20 @@ int main(){
     cin>>n>>k;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
-    map<int, int> mp;
-    int cnt = 0;
-    for(int i = 0, j = 0; j<n; j++){
-        if(++mp[a[j]]==1) cnt++;
-        if(j-i+1==k){
+    vector<int> b(a);
+    sort(b.begin(), b.end());
+
+    vector<int> mp(n, 0);
+    for(int i = 0, cnt = 0; i < n; i++){
+        a[i] = lower_bound(b.begin(), b.end(), a[i]) - b.begin();
+        cnt += ++mp[a[i]] == 1;
+        if(i >= k - 1){
             cout<<cnt<<' ';
-            if(--mp[a[i++]]==0) cnt--;
+            cnt -= --mp[a[i - k + 1]] == 0;
         }
     }
-    
+
     return 0;
 }

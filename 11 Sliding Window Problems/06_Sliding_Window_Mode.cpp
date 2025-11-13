@@ -9,41 +9,45 @@ int main(){
     cin>>n>>k;
 
     vector<int> a(n);
-    for(int &i:a) cin>>i;
+    for(int &i : a) cin>>i;
 
-    unordered_map<int, int> freq;
-    map<int, set<int>> mp;
-
-    auto add = [&](int v)->void{
-        int pv = freq[v];
-        freq[v]++;
-        int nv = freq[v];
-        mp[pv].erase(v);
-        if(mp[pv].empty()) mp.erase(pv);
-        mp[nv].insert(v);
-    };
-
-    auto remove = [&](int v)->void{
-        int pv = freq[v];
-        freq[v]--;
-        int nv = freq[v];
-        mp[pv].erase(v);
-        if(mp[pv].empty()) mp.erase(pv);
-        if(nv != 0) mp[nv].insert(v);
-    };
+    vector<int> b(a);
+    sort(b.begin(), b.end());
     
-    auto mode = [&]()->int{
-        auto &s = mp.rbegin()->second;
-        return *s.begin();
+    auto comp = [&](pair<int, int> & a, pair<int, int> & b){
+        if(a.first == b.first) return a.second > b.second;
+        return a.first < b.first;
     };
 
-    for(int i = 0, j = 0; j<n; j++){
-        add(a[j]);
-        if(j-i+1==k){
-            cout<<mode()<<' ';
-            remove(a[i++]);
+    vector<int> mp(n, 0);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(comp)> pq(comp);
+
+    auto add = [&](int v){
+        pq.emplace(++mp[v], v);
+    };
+
+    auto remove = [&](int v){
+        mp[v]--;
+        if(mp[v]) pq.emplace(mp[v], v);
+    };
+
+    auto get = [&](){
+        while(1){
+            auto [f, v] = pq.top();
+            if(mp[v] != f) pq.pop();
+            else break;
+        }
+        return b[pq.top().second];
+    };
+
+    for(int i = 0; i < n; i++){
+        a[i] = lower_bound(b.begin(), b.end(), a[i]) - b.begin();
+        add(a[i]);
+        if(i >= k - 1){
+            cout<<get()<<' ';
+            remove(a[i - k + 1]);
         }
     }
-    
+
     return 0;
 }

@@ -13,19 +13,20 @@ int main(){
 
     vector<int> arr(n);
     arr[0] = x;
-    for(int i = 1; i<n; i++){
-        arr[i] = (1ll * a * arr[i-1] + b) % c;
+    for(int i = 1; i < n; i++){
+        arr[i] = (1ll * a * arr[i - 1] + b) % c;
     }
 
-    long long res = 0, curr = 0;
-    for(int i = 0, j = 0; j<n; j++){
-        curr += arr[j];
-        if(j-i+1==k){ 
+    long long curr = 0, res = 0;
+    for(int i = 0; i < n; i++){
+        curr += arr[i];
+        if(i >= k - 1){
             res ^= curr;
-            curr -= arr[i++];
+            curr -= arr[i - k + 1];
         }
     }
+
     cout<<res;
-    
+
     return 0;
 }

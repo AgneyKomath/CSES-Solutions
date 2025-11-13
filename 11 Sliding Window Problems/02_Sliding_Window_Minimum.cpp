@@ -13,22 +13,20 @@ int main(){
 
     vector<int> arr(n);
     arr[0] = x;
-    for(int i = 1; i<n; i++){
-        arr[i] = (1ll * a * arr[i-1] + b) % c;
+    for(int i = 1; i < n; i++){
+        arr[i] = (1ll * a * arr[i - 1] + b) % c;
     }
 
-    int res = 0;
     deque<int> q;
-    for(int i = 0, j = 0; j<n; j++){
-        while(!q.empty() && arr[q.back()]>=arr[j]) q.pop_back();
-        q.push_back(j);
-        if(j-i+1==k){
-            res ^= arr[q.front()];
-            if(q.front()==i) q.pop_front();
-            i++;
-        }
-    }   
+    int res = 0;
+    for(int i = 0; i < n; i++){
+        while(!q.empty() && arr[q.back()] >= arr[i]) q.pop_back();
+        q.push_back(i);
+        if(i >= k - 1) res ^= arr[q.front()];
+        if(q.front() == i - k + 1) q.pop_front();
+    }
+
     cout<<res;
-    
+
     return 0;
 }
