@@ -1,4 +1,4 @@
-# Answer isn't be precise enough on C++ 😢
+# Answer can't be precise enough on C++ 😢
 from fractions import Fraction
 
 n = int(input())

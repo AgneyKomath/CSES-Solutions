@@ -12,7 +12,7 @@ struct Shash{
         s = _s;
         n = s.size();
 
-        u64 p = std::chrono::steady_clock::now().time_since_epoch().count() | 1ULL;
+        p = std::chrono::steady_clock::now().time_since_epoch().count() | 1ULL;
         if(p < (1ULL << 20)) p |= (1ULL << 20);
 
         pw.resize(n + 1);
@@ -24,7 +24,7 @@ struct Shash{
         }
     }
 
-    int query(int l, int r){
+    u64 query(int l, int r){
         if(l > r) return 0;
         return pref[r + 1] - pref[l] * pw[r - l + 1];
     }
