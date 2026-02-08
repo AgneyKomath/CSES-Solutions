@@ -3,64 +3,90 @@ using namespace std;
 
 struct Tree{
     // Tree Struct by Fusion15
-    int root, log, n;
+    int root, log, n, timer;
     vector<vector<int>> adj, jump;
-    vector<int> depth, parent;
-
-    void dfs(int u){
-        for(int v:adj[u]){
-            if(v != parent[u]){
-                parent[v] = u;
-                depth[v] = 1 + depth[u];
-                dfs(v);
-            }
-        }
-    }
-
-    void build(){
-        for(int i = 0; i<n; i++) jump[i][0] = parent[i];
-        for(int i = 1; i<log; i++){
-            for(int u = 0; u<n; u++){
-                int v = jump[u][i-1];
-                if(v==-1) continue;
-                jump[u][i] = jump[v][i-1];
-            }
-        }
-    }
+    vector<int> depth, par, sub, tin, tout;
 
     Tree(vector<vector<int>> & a, int r = 0){
-        adj = a;
+        adj = a, root = r;
+        init();
+    }
+
+    Tree(vector<int> &p){
+        int r = -1, n = p.size();
+        adj.resize(n);
+        for(int i = 0; i < n; i++){
+            if(p[i] != -1){
+                adj[i].push_back(p[i]);
+                adj[p[i]].push_back(i);
+            }
+            else{
+                r = i;
+            }
+        }
+        root = r;
+        init();
+    }
+
+    void init(){
         n = adj.size();
         log = __lg(n) + 1;
-        root = r;
-
-        jump.assign(n, vector<int>(log, -1));
-        parent.assign(n, -1);
+        timer = 0;
+        
+        jump.assign(log, vector<int>(n, -1));
+        par.assign(n, -1);
         depth.assign(n, 0);
-
+        sub.assign(n, 1);
+        tin.assign(n, 0);
+        tout.assign(n, 0);
+        
         dfs(root);
         build();
     }
 
+    void dfs(int u){
+        tin[u] = timer++;
+        for(int v : adj[u]){
+            if(v == par[u]) continue;
+            par[v] = u;
+            depth[v] = 1 + depth[u];
+            dfs(v);
+            sub[u] += sub[v];
+        }
+        tout[u] = timer - 1;
+    }
+
+    void build(){
+        for(int i = 0; i < n; i++) jump[0][i] = par[i];
+        for(int i = 1; i < log; i++){
+            for(int j = 0; j < n; j++){
+                if(jump[i - 1][j] == -1) continue;
+                jump[i][j] = jump[i - 1][jump[i - 1][j]];
+            }
+        }
+    }
+
     int kth_ancestor(int u, int k){
-        if(k>depth[u]) return -1;
-        for(int i = log-1; i>=0; i--){
-            if(k & (1<<i)) u = jump[u][i];
+        if(k > depth[u]) return -1;  
+        for(int i = 0; i < log; i++){
+            if((k >> i) & 1){
+                u = jump[i][u];
+            }
         }
         return u;
     }
 
     int lca(int u, int v){
-        if(depth[u]<depth[v]) swap(u, v);
+        if(depth[u] < depth[v]) swap(u, v);
         u = kth_ancestor(u, depth[u] - depth[v]);
-        if(u==v) return u;
-        for(int i = log-1; i>=0; i--){
-            if(jump[u][i] != jump[v][i]){
-                u = jump[u][i];
-                v = jump[v][i];
+        if(u == v) return u;
+        for(int i = log - 1; i >= 0; i--){
+            if(jump[i][u] != jump[i][v]){
+                u = jump[i][u];
+                v = jump[i][v];
             }
         }
-        return jump[u][0];
+        return jump[0][u];
     }
 
     int distance(int u, int v){
@@ -69,7 +95,7 @@ struct Tree{
     }
 
     bool is_ancestor(int u, int v){
-        return lca(u, v) == u;
+        return tin[u] <= tin[v] && tout[u] >= tout[v];
     }
 };
 
@@ -81,40 +107,38 @@ int main(){
     cin>>n>>m;
 
     vector<vector<int>> adj(n);
-    for(int i = 0; i<n-1; i++){
+    for(int i = 0; i < n - 1; i++){
         int u, v;
         cin>>u>>v;
-        u--;v--;
+        u--, v--;
         adj[u].push_back(v);
         adj[v].push_back(u);
     }
 
     Tree tr(adj);
 
-    vector<int> val(n, 0);
-    for(int i = 0; i<m; i++){
+    vector<int> a(n, 0);
+    for(int i = 0; i < m; i++){
         int u, v;
         cin>>u>>v;
-        u--;
-        v--;
+        u--, v--;
+        a[u]++;
+        a[v]++;
         int lca = tr.lca(u, v);
-        val[u]++;
-        val[v]++;
-        // remove 2*lca but one time remove parent of lca because lca is also in path
-        val[lca]--;
-        if(tr.parent[lca] != -1) val[tr.parent[lca]]--;
+        a[lca]--;
+        if(lca != 0) a[tr.par[lca]]--;
     }
 
     auto dfs = [&](int u, int p, auto &&dfs)->void{
-        for(int v:adj[u]){
-            if(v==p) continue;
+        for(int v : adj[u]){
+            if(v == p) continue;
             dfs(v, u, dfs);
-            val[u] += val[v];
+            a[u] += a[v];
         }
     };
     dfs(0, -1, dfs);
 
-    for(auto i:val) cout<<i<<' ';
-    
+    for(int i : a) cout<<i<<' ';
+
     return 0;
 }

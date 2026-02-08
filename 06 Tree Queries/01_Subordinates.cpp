@@ -9,24 +9,22 @@ int main(){
     cin>>n;
 
     vector<vector<int>> adj(n);
-    for(int i = 1; i<n; i++){
-        int p;
-        cin>>p;
-        p--;
-        adj[p].push_back(i);
+    for(int i = 1; i < n; i++){
+        int u;
+        cin>>u;
+        adj[u - 1].push_back(i);
     }
 
-    vector<int> res(n, 0);
+    vector<int> sub(n, 0);
     auto dfs = [&](int u, auto &&dfs)->void{
-        for(int v:adj[u]){
+        for(int v : adj[u]){
             dfs(v, dfs);
-            res[u] += 1 + res[v]; 
+            sub[u] += 1 + sub[v];
         }
     };
-
     dfs(0, dfs);
 
-    for(int i:res) cout<<i<<' ';
-    
+    for(int i : sub) cout<<i<<' ';
+
     return 0;
 }
