@@ -17,19 +17,20 @@ int main(){
         adj[v].push_back(u);
     }
 
-    auto dfs = [&](int u, int p, int d, auto &&dfs)->pair<int, int>{
-        pair<int, int> res = {d, u};
+    int res = 0;
+    auto dfs = [&](int u, int p, auto &&dfs)->int{
+        int mx = 0;
         for(int v : adj[u]){
             if(v == p) continue;
-            res = max(res, dfs(v, u, d + 1, dfs));
+            int val = dfs(v, u, dfs);
+            res = max(res, mx + val);
+            mx = max(mx, val);
         }
-        return res;
+        return 1 + mx;
     };
+    dfs(0, -1, dfs);
 
-    int farthestNode = dfs(0, -1, 0, dfs).second;
-    int diameter = dfs(farthestNode, -1, 0, dfs).first;
-
-    cout<<diameter;
+    cout<<res;
 
     return 0;
 }
