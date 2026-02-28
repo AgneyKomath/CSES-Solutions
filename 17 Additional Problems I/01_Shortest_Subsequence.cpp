@@ -4,10 +4,10 @@ using namespace std;
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    
+
     string s;
     cin>>s;
-    
+
     int seen = 0;
 
     string res;
@@ -28,6 +28,6 @@ int main(){
     }
 
     cout<<res;
-    
+
     return 0;
 }
