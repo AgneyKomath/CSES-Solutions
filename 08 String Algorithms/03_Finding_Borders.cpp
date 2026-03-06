@@ -27,9 +27,9 @@ int main(){
     for(int i = lps[n - 1]; i > 0; i = lps[i - 1]){
         res.push_back(i);
     }
-    
+
     reverse(res.begin(), res.end());
     for(int i : res) cout<<i<<' ';
-    
+
     return 0;
 }

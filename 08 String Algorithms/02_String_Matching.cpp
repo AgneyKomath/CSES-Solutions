@@ -36,6 +36,6 @@ int main(){
         else i++;
     }
     cout<<res;
-    
+
     return 0;
 }
